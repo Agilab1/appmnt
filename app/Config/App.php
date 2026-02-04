@@ -16,8 +16,8 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost/appmnt/';
-    // public string $baseURL = 'https://agilesaptech.com/appmnt/';
+    // public string $baseURL = 'http://localhost/appmnt/';
+    public string $baseURL = 'https://agilesaptech.com/appmnt/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
