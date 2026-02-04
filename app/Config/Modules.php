@@ -12,6 +12,8 @@ use CodeIgniter\Modules\Modules as BaseModules;
  */
 class Modules extends BaseModules
 {
+    public bool $discoverTests = false;
+
     /**
      * --------------------------------------------------------------------------
      * Enable Auto-Discovery?
