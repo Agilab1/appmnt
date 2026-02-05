@@ -25,7 +25,7 @@ class Database extends Config
      * @var array<string, mixed>
      */
 
-    // local database code 
+    // local database code
 
     // public array $default = [
     //     'DSN'          => '',
@@ -54,7 +54,7 @@ class Database extends Config
     //     ],
     // ];
 
-    // cpanel database code 
+    // cpanel database code
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'agilesaptech.com',
@@ -81,7 +81,7 @@ class Database extends Config
             'time'     => 'H:i:s',
         ],
     ];
-     
+
 
     //    /**
     //     * Sample database connection for SQLite3.

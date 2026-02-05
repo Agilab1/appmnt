@@ -1,5 +1,5 @@
      <?php
-      $name = session('staff_name'); // उदा: "Dhiraj Shinde"
+      $name = session('staff_name');
       $initials = '';
 
       if ($name) {

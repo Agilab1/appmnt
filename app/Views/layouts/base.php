@@ -63,6 +63,25 @@
     href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
     integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
     crossorigin="anonymous" />
+
+<style>
+    body {
+    overflow-x: auto;
+}
+.app-wrapper,
+.app-main {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+.app-main > .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+body > .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+</style>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
