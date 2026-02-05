@@ -3,22 +3,29 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\StaffModel;
+use App\Models\AdminModel; // ✅ ADD THIS
 
 class StaffController extends BaseController
 {
+    protected $StaffModel;
+    protected $AdminModel;   // ✅ ADD THIS
+    protected $data = [];
+
     public function __construct()
     {
         helper('form');
-        $session = session();
+
         $this->StaffModel = new StaffModel();
+        $this->AdminModel = new AdminModel(); // ✅ ADD THIS
+
         $this->data['staffs'] = $this->StaffModel->findAll();
         $this->data['types'] = [
             'admin' => 'Admin',
             'staff' => 'Staff'
         ];
     }
+
 
     // public function index()
     // {
@@ -119,7 +126,7 @@ class StaffController extends BaseController
             ->with('status', 'Staff Deactivated');
     }
 
-    // staff login 
+    // staff login
 
     public function login()
     {
@@ -127,38 +134,65 @@ class StaffController extends BaseController
 
         if ($this->request->is('post')) {
 
-            $email_id = $this->request->getPost('email_id');
-            $pass_wd  = $this->request->getPost('pass_wd');
+            $email    = $this->request->getPost('email_id');
+            $password = $this->request->getPost('pass_wd');
 
+            /*
+            |----------------------------------
+            | 1️⃣ CHECK ADMIN FIRST
+            |----------------------------------
+            */
+            $admin = $this->AdminModel
+                ->where('email', $email)
+                ->first();
+
+            if ($admin && password_verify($password, $admin->password)) {
+
+                $session->set([
+                    'isLoggedIn'      => true,
+                    'role'            => 'admin',
+                    'admin_logged_in' => true,
+                    'admin_id'        => $admin->id,
+                    'admin_name'      => $admin->name,
+                ]);
+
+                return redirect()->to('/admin/dashboard');
+            }
+
+            /*
+            |----------------------------------
+            | 2️⃣ CHECK STAFF
+            |----------------------------------
+            */
             $staff = $this->StaffModel
-                ->where('email_id', $email_id)
+                ->where('email_id', $email)
                 ->where('status', 1)
                 ->first();
 
-            if (!$staff || !password_verify($pass_wd, $staff->pass_wd)) {
-                return redirect()->back()
-                    ->with('error', 'Invalid Email or Password');
+            if ($staff && password_verify($password, $staff->pass_wd)) {
+
+                $session->set([
+                    'isLoggedIn'  => true,
+                    'role'        => 'staff',
+                    'emp_code'    => $staff->emp_code,
+                    'staff_name'  => $staff->first_nm . ' ' . $staff->last_nm,
+                    'email_id'    => $staff->email_id,
+                ]);
+
+                return redirect()->to('/staff');
             }
 
-            //  LOGIN SUCCESS → SESSION
-            $session->set([
-                'emp_code'   => $staff->emp_code,
-                'staff_name' => $staff->first_nm . ' ' . $staff->last_nm,
-                'email_id'   => $staff->email_id,
-                'role'       => $staff->role,
-                'isLoggedIn' => true
-            ]);
-
-            return redirect()->to('/staff');
+            return redirect()->back()->with('error', 'Invalid Email or Password');
         }
 
         return view('staff/login');
     }
 
+   public function logout()
+{
+    $session = session();
+    $session->destroy();
+    return redirect()->to(base_url('login'));
+}
 
-    public function logout()
-    {
-        $session = session_destroy();
-        return redirect()->to(base_url('staff/login'));
-    }
 }
