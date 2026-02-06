@@ -10,9 +10,11 @@
 
 <div class="container-fluid">
     <div class="card">
-
         <div class="card-header">
-            <div class="row align-items-center">
+        <div class="row">
+            <?= $this->include('layouts/messages');  ?>
+        </div>
+        <div class="row align-items-center">
                 <div class="col-sm-4">
                     <h5 class="card-title mb-0">List of Users</h5>
                 </div>

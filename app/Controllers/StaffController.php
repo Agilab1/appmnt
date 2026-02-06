@@ -4,20 +4,20 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\StaffModel;
-use App\Models\AdminModel; // ✅ ADD THIS
+use App\Models\AdminModel; //  ADD THIS
 
 class StaffController extends BaseController
 {
     protected $StaffModel;
-    protected $AdminModel;   // ✅ ADD THIS
+    protected $AdminModel;   //  ADD THIS
     protected $data = [];
 
     public function __construct()
     {
         helper('form');
-
+        $session = session();
         $this->StaffModel = new StaffModel();
-        $this->AdminModel = new AdminModel(); // ✅ ADD THIS
+        $this->AdminModel = new AdminModel(); //  ADD THIS
 
         $this->data['staffs'] = $this->StaffModel->findAll();
         $this->data['types'] = [
