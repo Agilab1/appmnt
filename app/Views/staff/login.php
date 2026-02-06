@@ -14,7 +14,7 @@
             <div class="col-md-4">
 
                 <div class="card shadow">
-                    <div class="card-header text-center btn btn-primary">
+                    <div class="btn btn-primary text-center ">
                         <h4>Login</h4>
                     </div>
 
