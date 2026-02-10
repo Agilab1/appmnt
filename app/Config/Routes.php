@@ -34,10 +34,14 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     | STAFF ROUTES
     */
     $routes->group('staff', function ($routes) {
+        $routes->get('appointments', 'StaffController::appointments');
         $routes->get('/', 'StaffController::index');
+        $routes->get('dashboard', 'StaffController::dashboard');
         $routes->match(['get', 'post'], 'create', 'StaffController::create');
         $routes->match(['get', 'post'], 'update/(:any)', 'StaffController::update/$1');
         $routes->get('delete/(:any)', 'StaffController::delete/$1');
+        $routes->get('appointment/approve/(:num)', 'StaffController::approve/$1');
+        $routes->get('appointment/reject/(:num)', 'StaffController::reject/$1');
     });
 
     /*

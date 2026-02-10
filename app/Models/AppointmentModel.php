@@ -12,9 +12,10 @@ class AppointmentModel extends Model
     protected $allowedFields = [
         'admin_id',
         'name',
+        'emp_code',
         'mobile',
         'email',
-        'appointment_date',
+        'appointment_datetime',
         'purpose',
         'status'
     ];

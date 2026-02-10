@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\StaffModel;
 use App\Models\AdminModel; //  ADD THIS
+use App\Models\AppointmentModel;
 
 class StaffController extends BaseController
 {
@@ -128,71 +129,146 @@ class StaffController extends BaseController
 
     // staff login
 
-    public function login()
-    {
-        $session = session();
+   public function login()
+{
+    $session = session();
 
-        if ($this->request->is('post')) {
+    if ($this->request->is('post')) {
 
-            $email    = $this->request->getPost('email_id');
-            $password = $this->request->getPost('pass_wd');
+        $email    = $this->request->getPost('email_id');
+        $password = $this->request->getPost('pass_wd');
 
-            /*
-            |----------------------------------
-            | 1️⃣ CHECK ADMIN FIRST
-            |----------------------------------
-            */
-            $admin = $this->AdminModel
-                ->where('email', $email)
-                ->first();
+        /*
+        | ADMIN LOGIN
+        */
+        $admin = $this->AdminModel
+            ->where('email', $email)
+            ->first();
 
-            if ($admin && password_verify($password, $admin->password)) {
+        if ($admin && password_verify($password, $admin->password))
+{
 
-                $session->set([
-                    'isLoggedIn'      => true,
-                    'role'            => 'admin',
-                    'admin_logged_in' => true,
-                    'admin_id'        => $admin->id,
-                    'admin_name'      => $admin->name,
-                ]);
+            $session->set([
+                'isLoggedIn'      => true,
+                'role'            => 'admin',
+                'admin_logged_in' => true,
+                'admin_id'   => $admin->id,
+                'admin_name' => $admin->name,
 
-                return redirect()->to('/admin/dashboard');
-            }
+            ]);
 
-            /*
-            |----------------------------------
-            | 2️⃣ CHECK STAFF
-            |----------------------------------
-            */
-            $staff = $this->StaffModel
-                ->where('email_id', $email)
-                ->where('status', 1)
-                ->first();
-
-            if ($staff && password_verify($password, $staff->pass_wd)) {
-
-                $session->set([
-                    'isLoggedIn'  => true,
-                    'role'        => 'staff',
-                    'emp_code'    => $staff->emp_code,
-                    'staff_name'  => $staff->first_nm . ' ' . $staff->last_nm,
-                    'email_id'    => $staff->email_id,
-                ]);
-
-                return redirect()->to('/staff');
-            }
-
-            return redirect()->back()->with('error', 'Invalid Email or Password');
+            return redirect()->to('/admin/dashboard');
         }
 
-        return view('staff/login');
+        /*
+        | STAFF LOGIN
+        */
+        $staff = $this->StaffModel
+            ->where('email_id', $email)
+            ->where('status', 1)
+            ->first();
+
+        if ($staff && password_verify($password, $staff->pass_wd))
+ {
+
+           $session->set([
+            'isLoggedIn' => true,
+            'role'       => 'staff',
+            'admin_id'   => 1, // same admin_id used in appointments table
+            'emp_code'   => $staff->emp_code,
+            'staff_name' => $staff->first_nm . ' ' . $staff->last_nm,
+            'email_id'   => $staff->email_id,
+        ]);
+
+
+            return redirect()->to('/staff/dashboard');
+        }
+
+        return redirect()->back()->with('error', 'Invalid Email or Password');
     }
 
+    return view('staff/login');
+}
    public function logout()
 {
     $session = session();
     $session->destroy();
     return redirect()->to(base_url('login'));
 }
+
+public function dashboard()
+{
+    if (
+        ! session()->get('isLoggedIn') ||
+        session()->get('role') !== 'staff'
+    ) {
+        return redirect()->to('/login');
+    }
+
+    $empCode = session()->get('emp_code');
+    $model = new AppointmentModel();
+
+    $data = [
+        'total' => $model->where('emp_code', $empCode)->countAllResults(),
+
+        'pending' => $model->where([
+            'emp_code' => $empCode,
+            'status'   => 'Pending'
+        ])->countAllResults(),
+
+        'approved' => $model->where([
+            'emp_code' => $empCode,
+            'status'   => 'Approved'
+        ])->countAllResults(),
+
+        'rejected' => $model->where([
+            'emp_code' => $empCode,
+            'status'   => 'Rejected'
+        ])->countAllResults(),
+
+        // ADD THIS PART
+ 'appointments' => $model
+    ->where('emp_code', $empCode)
+    ->orderBy('appointment_datetime', 'DESC')
+    ->findAll()
+
+
+    ];
+
+    return view('staff/dashboard', $data);
+}
+
+public function appointments()
+{
+    $empCode = session()->get('emp_code');
+
+    $model = new \App\Models\AppointmentModel();
+
+    $data['appointments'] = $model
+        ->where('emp_code', $empCode)
+        ->orderBy('id', 'DESC')
+        ->findAll();
+
+    return view('staff/appointments', $data);
+}
+public function approve($id)
+{
+    $model = new \App\Models\AppointmentModel();
+    $model->update($id, ['status' => 'Approved']);
+
+    return redirect()->to('/staff/dashboard');
+}
+
+public function reject($id)
+{
+    $model = new \App\Models\AppointmentModel();
+    $model->update($id, ['status' => 'Rejected']);
+
+    return redirect()->to('/staff/dashboard');
+}
+
+
+
+
 
 }

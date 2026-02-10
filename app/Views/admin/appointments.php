@@ -17,6 +17,7 @@
                 <th>Name</th>
                 <th>Mobile</th>
                 <th>Date</th>
+                 <th>Time</th>
                 <th>Purpose</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -28,6 +29,8 @@
                     <td><?= esc($row['name']) ?></td>
                     <td><?= esc($row['mobile']) ?></td>
                     <td><?= esc($row['appointment_date']) ?></td>
+                     <td><?= esc($row['appointment_time']) ?></td>
+
                     <td><?= esc($row['purpose']) ?></td>
                     <td>
                         <span class="badge

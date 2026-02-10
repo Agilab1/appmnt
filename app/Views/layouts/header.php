@@ -1,15 +1,26 @@
-     <?php
-      $name = session('staff_name');
-      $initials = '';
+<?php
+$role = session()->get('role');
 
-      if ($name) {
-        $parts = explode(' ', trim($name));
-        $initials = strtoupper(
-          substr($parts[0], 0, 1) .
-            (isset($parts[1]) ? substr($parts[1], 0, 1) : '')
-        );
-      }
-      ?>
+if ($role === 'admin') {
+    $name = session()->get('admin_name');
+} elseif ($role === 'staff') {
+    $name = session()->get('staff_name');
+} else {
+    $name = 'User';
+}
+
+$initials = '';
+
+if (!empty($name)) {
+    $parts = explode(' ', trim($name));
+    $initials = strtoupper(
+        substr($parts[0], 0, 1) .
+        (isset($parts[1]) ? substr($parts[1], 0, 1) : '')
+    );
+}
+?>
+
+
 
      <!--begin::Header-->
      <nav class="app-header navbar navbar-expand bg-body">
@@ -176,7 +187,8 @@
 
                <!-- USER NAME -->
                <span class="d-none d-md-inline fw-semibold text-dark">
-                 <?= esc(session('staff_name')) ?>
+                 <?= esc($name) ?>
+
                </span>
 
              </a>
@@ -195,7 +207,7 @@
 
                  <!-- USER NAME -->
                  <p class="mb-0 fw-semibold">
-                   <?= esc(session('staff_name')) ?>
+                   <?= esc($name) ?>
                  </p>
 
                </li>

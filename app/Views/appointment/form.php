@@ -13,7 +13,7 @@
 
 <body class="bg-light d-flex align-items-center min-vh-100">
 
-    <div class="container px-3">
+    <div class="container px-3">                         
         <div class="row justify-content-center">
             <div class="col-12 col-sm-10 col-md-6 col-lg-5">
 
@@ -23,6 +23,13 @@
                     </div>
 
                     <div class="card-body p-4">
+                        <?php if (session()->getFlashdata('success')): ?>
+                    <div class="alert alert-success shadow-sm border-0">
+                        <?= session()->getFlashdata('success') ?>
+                    </div>
+                <?php endif; ?>
+
+
 
                         <form method="post" action="<?= base_url('appointment/submit') ?>">
                             <?= csrf_field() ?>
@@ -47,14 +54,31 @@
                                 <label class="form-label">Email</label>
                                 <input type="email" name="email"
                                     class="form-control form-control-lg">
+                          <div class="mb-3">
+                            <label class="form-label">Appointment Date & Time</label>
+                            <input type="datetime-local"
+                                name="appointment_datetime"
+                                class="form-control form-control-lg"
+                                step="1800"
+                                min="<?= date('Y-m-d\TH:i', ceil(time()/1800)*1800) ?>"
+
+                                required>
+                            </div>
+                            <div>
+                            <label class="form-label">Staff Name</label>
+                            <select name="emp_code" class="form-control form-control-lg" required>
+                                <option value="">Choose Staff</option>
+
+                                <?php if (!empty($staffs)) : ?>
+                                    <?php foreach ($staffs as $staff): ?>
+                                        <option value="<?= esc($staff->emp_code) ?>">
+                                            <?= esc($staff->first_nm . ' ' . $staff->last_nm) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Appointment Date</label>
-                                <input type="date" name="appointment_date"
-                                    class="form-control form-control-lg"
-                                    required>
-                            </div>
 
                             <div class="mb-4">
                                 <label class="form-label">Purpose</label>
@@ -80,3 +104,34 @@
 </body>
 
 </html>
+<!-- <script>
+document.getElementById('appointment_datetime')
+.addEventListener('change', function () {
+
+    let value = this.value;
+    if (!value) return;
+
+    let dt = new Date(value);
+
+    let minutes = dt.getMinutes();
+    let rounded = Math.round(minutes / 30) * 30;
+
+    if (rounded === 60) {
+        dt.setHours(dt.getHours() + 1);
+        dt.setMinutes(0);
+    } else {
+        dt.setMinutes(rounded);
+    }
+
+    dt.setSeconds(0);
+
+    // FIX: format local datetime manually
+    let year = dt.getFullYear();
+    let month = String(dt.getMonth() + 1).padStart(2, '0');
+    let day = String(dt.getDate()).padStart(2, '0');
+    let hours = String(dt.getHours()).padStart(2, '0');
+    let mins = String(dt.getMinutes()).padStart(2, '0');
+
+    this.value = `${year}-${month}-${day}T${hours}:${mins}`;
+});
+</script> -->
