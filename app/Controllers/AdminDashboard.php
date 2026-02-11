@@ -7,25 +7,26 @@ use App\Models\AppointmentModel;
 class AdminDashboard extends BaseController
 {
    public function index()
-{
-    if (
-        ! session()->get('isLoggedIn') ||
-        session()->get('role') !== 'admin'
-    ) {
-        return redirect()->to('/login');
-    }
+   {
+        if (
+            ! session()->get('isLoggedIn') ||
+            session()->get('role') !== 'admin'
+        ) {
+            return redirect()->to('/login');
+        }
 
-    $adminId = session()->get('admin_id');
-    $model   = new AppointmentModel();
+        $adminId = session()->get('admin_id');
+        $model   = new AppointmentModel();
 
-    $data = [
-        'total'    => $model->where('admin_id', $adminId)->countAllResults(),
-        'pending'  => $model->where(['admin_id'=>$adminId,'status'=>'Pending'])->countAllResults(),
-        'approved' => $model->where(['admin_id'=>$adminId,'status'=>'Approved'])->countAllResults(),
-        'rejected' => $model->where(['admin_id'=>$adminId,'status'=>'Rejected'])->countAllResults(),
-    ];
+        $data = [
+            'appointments' => $model->where('admin_id', $adminId)->findAll(), // ← ADD THIS
 
-    return view('admin/dashboard', $data);
-}
+            'total'    => $model->where('admin_id', $adminId)->countAllResults(),
+            'pending'  => $model->where(['admin_id'=>$adminId,'status'=>'Pending'])->countAllResults(),
+            'approved' => $model->where(['admin_id'=>$adminId,'status'=>'Approved'])->countAllResults(),
+            'rejected' => $model->where(['admin_id'=>$adminId,'status'=>'Rejected'])->countAllResults(),
+        ];
 
+        return view('admin/dashboard', $data);
+   }
 }

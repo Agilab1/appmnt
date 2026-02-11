@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\StaffModel;
 use App\Models\AdminModel; //  ADD THIS
 use App\Models\AppointmentModel;
+use App\Models\SecurityModel;
 
 class StaffController extends BaseController
 {
@@ -129,14 +130,18 @@ class StaffController extends BaseController
 
     // staff login
 
-   public function login()
+public function login()
 {
     $session = session();
 
     if ($this->request->is('post')) {
 
-        $email    = $this->request->getPost('email_id');
-        $password = $this->request->getPost('pass_wd');
+      $email = $this->request->getPost('email_id') 
+      ?? $this->request->getPost('email');
+
+$password = $this->request->getPost('pass_wd') 
+          ?? $this->request->getPost('password');
+
 
         /*
         | ADMIN LOGIN
@@ -145,20 +150,48 @@ class StaffController extends BaseController
             ->where('email', $email)
             ->first();
 
-        if ($admin && password_verify($password, $admin->password))
-{
+        if ($admin && password_verify($password, $admin->password)) {
 
             $session->set([
                 'isLoggedIn'      => true,
                 'role'            => 'admin',
                 'admin_logged_in' => true,
-                'admin_id'   => $admin->id,
-                'admin_name' => $admin->name,
-
+                'admin_id'        => $admin->id,
+                'admin_name'      => $admin->name,
             ]);
 
             return redirect()->to('/admin/dashboard');
         }
+
+        /*
+        | SECURITY LOGIN  ← ADD THIS BLOCK
+        */
+       /*
+| SECURITY LOGIN
+*/
+/*
+| SECURITY LOGIN
+*/
+$securityModel = new SecurityModel();
+
+$security = $securityModel
+    ->where('email_id', trim($email))
+    ->first();
+
+if ($security && password_verify(trim($password), $security->pass_wd)) {
+
+    session()->set([
+        'isLoggedIn' => true,
+        'role' => 'security',
+        'security_id' => $security->id,
+        'security_name' => $security->name
+    ]);
+
+    return redirect()->to('/security/dashboard');
+}
+
+
+
 
         /*
         | STAFF LOGIN
@@ -168,18 +201,16 @@ class StaffController extends BaseController
             ->where('status', 1)
             ->first();
 
-        if ($staff && password_verify($password, $staff->pass_wd))
- {
+        if ($staff && password_verify($password, $staff->pass_wd)) {
 
-           $session->set([
-            'isLoggedIn' => true,
-            'role'       => 'staff',
-            'admin_id'   => 1, // same admin_id used in appointments table
-            'emp_code'   => $staff->emp_code,
-            'staff_name' => $staff->first_nm . ' ' . $staff->last_nm,
-            'email_id'   => $staff->email_id,
-        ]);
-
+            $session->set([
+                'isLoggedIn' => true,
+                'role'       => 'staff',
+                'admin_id'   => 1,
+                'emp_code'   => $staff->emp_code,
+                'staff_name' => $staff->first_nm . ' ' . $staff->last_nm,
+                'email_id'   => $staff->email_id,
+            ]);
 
             return redirect()->to('/staff/dashboard');
         }
@@ -189,6 +220,7 @@ class StaffController extends BaseController
 
     return view('staff/login');
 }
+
    public function logout()
 {
     $session = session();
@@ -236,6 +268,7 @@ public function dashboard()
     ];
 
     return view('staff/dashboard', $data);
+    
 }
 
 public function appointments()

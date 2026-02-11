@@ -12,8 +12,8 @@
                     <tr>
                         <th>Name</th>
                         <th>Mobile</th>
-                       <th>Appointment</th>
-                        <th>Purpose</th>
+                        <th>Appointment</th>
+                        <th>Agenda</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>

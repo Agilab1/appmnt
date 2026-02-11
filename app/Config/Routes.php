@@ -53,6 +53,14 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('appointment/approve/(:num)', 'AdminAppointments::approve/$1');
         $routes->get('appointment/reject/(:num)', 'AdminAppointments::reject/$1');
     });
+    //   | SECURITY ROUTES  ← ADD HERE
+ $routes->group('security', function ($routes) {
+    $routes->get('/', 'SecurityController::index');
+    $routes->get('dashboard', 'SecurityController::index');
+    $routes->get('checkin/(:num)', 'SecurityController::checkin/$1');
+   $routes->get('checkout/(:num)', 'SecurityController::checkout/$1');
+
+});
 
     /*
     | DEV ONLY

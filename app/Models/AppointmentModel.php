@@ -17,6 +17,9 @@ class AppointmentModel extends Model
         'email',
         'appointment_datetime',
         'purpose',
-        'status'
+        'status',
+        'entry_status',
+        'entry_time',
+        'exit_time'
     ];
 }

@@ -4,7 +4,7 @@
 
 <head>
   <!-- <base href="http://agilesaptech.com/pms/"> -->
-  <!-- <base href="http://localhost/appmnt/"> -->
+  <!-- <base href="http://localhost/app/"> -->
   <base href="https://agilesaptech.com/appmnt/">
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
