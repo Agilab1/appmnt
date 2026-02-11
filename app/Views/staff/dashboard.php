@@ -68,14 +68,14 @@
                     <?php if (!empty($appointments)) : ?>
                         <?php foreach ($appointments as $row) : ?>
                             <tr>
-                                <td><?= esc($row['name']) ?></td>
-                                <td><?= esc($row['mobile']) ?></td>
-                                <td><?= date('d M Y h:i A', strtotime($row['appointment_datetime'])) ?></td>
-                                <td><?= esc($row['purpose']) ?></td>
+                                <td><?= esc($row->name) ?></td>
+                                <td><?= esc($row->mobile) ?></td>
+                                <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
+                                <td><?= esc($row->purpose) ?></td>
                                 <td>
-                                    <?php if ($row['status'] == 'Pending'): ?>
+                                    <?php if ($row->status == 'Pending'): ?>
                                         <span class="badge bg-warning">Pending</span>
-                                    <?php elseif ($row['status'] == 'Approved'): ?>
+                                    <?php elseif ($row->status == 'Approved'): ?>
                                         <span class="badge bg-success">Approved</span>
                                     <?php else: ?>
                                         <span class="badge bg-danger">Rejected</span>
@@ -83,21 +83,19 @@
                                 </td>
 
                                 <td>
-                                    <?php if ($row['status'] == 'Pending') : ?>
-
-                                        <a href="<?= base_url('staff/appointment/approve/'.$row['id']) ?>"
+                                    <?php if ($row->status == 'Pending') : ?>
+                                        <a href="<?= base_url('staff/appointment/approve/'.$row->id) ?>"
                                         class="btn btn-success btn-sm">Approve</a>
 
-                                        <a href="<?= base_url('staff/appointment/reject/'.$row['id']) ?>"
+                                        <a href="<?= base_url('staff/appointment/reject/'.$row->id) ?>"
                                         class="btn btn-danger btn-sm">Reject</a>
-
                                     <?php else: ?>
                                         -
                                     <?php endif; ?>
                                 </td>
-
                             </tr>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+
                     <?php else: ?>
                         <tr>
                             <td colspan="5" class="text-center">No appointments found</td>
