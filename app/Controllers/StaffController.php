@@ -134,14 +134,13 @@ public function login()
 {
     $session = session();
 
-    if ($this->request->is('post')) {
+    if ($this->request->getMethod() === 'post') {
 
-      $email = $this->request->getPost('email_id') 
-      ?? $this->request->getPost('email');
+        $email = $this->request->getPost('email_id') 
+              ?? $this->request->getPost('email');
 
-$password = $this->request->getPost('pass_wd') 
-          ?? $this->request->getPost('password');
-
+        $password = $this->request->getPost('pass_wd') 
+                 ?? $this->request->getPost('password');
 
         /*
         | ADMIN LOGIN
@@ -153,45 +152,36 @@ $password = $this->request->getPost('pass_wd')
         if ($admin && password_verify($password, $admin->password)) {
 
             $session->set([
-                'isLoggedIn'      => true,
-                'role'            => 'admin',
+                'isLoggedIn' => true,
+                'role' => 'admin',
                 'admin_logged_in' => true,
-                'admin_id'        => $admin->id,
-                'admin_name'      => $admin->name,
+                'admin_id' => $admin->id,
+                'admin_name' => $admin->name,
             ]);
 
             return redirect()->to('/admin/dashboard');
         }
 
         /*
-        | SECURITY LOGIN  ← ADD THIS BLOCK
+        | SECURITY LOGIN
         */
-       /*
-| SECURITY LOGIN
-*/
-/*
-| SECURITY LOGIN
-*/
-$securityModel = new SecurityModel();
+        $securityModel = new \App\Models\SecurityModel();
 
-$security = $securityModel
-    ->where('email_id', trim($email))
-    ->first();
+        $security = $securityModel
+            ->where('email_id', trim($email))
+            ->first();
 
-if ($security && password_verify(trim($password), $security->pass_wd)) {
+        if ($security && password_verify(trim($password), $security->pass_wd)) {
 
-    session()->set([
-        'isLoggedIn' => true,
-        'role' => 'security',
-        'security_id' => $security->id,
-        'security_name' => $security->name
-    ]);
+            $session->set([
+                'isLoggedIn' => true,
+                'role' => 'security',
+                'security_id' => $security->id,
+                'security_name' => $security->name
+            ]);
 
-    return redirect()->to('/security/dashboard');
-}
-
-
-
+            return redirect()->to('/security/dashboard');
+        }
 
         /*
         | STAFF LOGIN
@@ -205,11 +195,11 @@ if ($security && password_verify(trim($password), $security->pass_wd)) {
 
             $session->set([
                 'isLoggedIn' => true,
-                'role'       => 'staff',
-                'admin_id'   => 1,
-                'emp_code'   => $staff->emp_code,
+                'role' => 'staff',
+                'admin_id' => 1,
+                'emp_code' => $staff->emp_code,
                 'staff_name' => $staff->first_nm . ' ' . $staff->last_nm,
-                'email_id'   => $staff->email_id,
+                'email_id' => $staff->email_id,
             ]);
 
             return redirect()->to('/staff/dashboard');
