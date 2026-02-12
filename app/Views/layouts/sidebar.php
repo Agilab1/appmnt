@@ -5,29 +5,30 @@
     left: 0;
     bottom: 0;
     width: 280px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .app-main {
-    margin-left: 280px;
+    margin-left: 250px;
   }
 
   .sidebar-brand {
-    padding: 30px 15px 20px;
+    padding: 25px 10px 25px;
+    margin: 0;
     text-align: center;
+    border-bottom: none !important;
   }
-
-  .sidebar-logo {
-    width: 260px;
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto;
-  }
-
   .brand-link {
+    display: block;
     padding: 0 !important;
+    margin: 0;
+    border: none !important;
+  }
+  .sidebar-logo {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 </style>
 <!--begin::Sidebar-->
