@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-
 class AppointmentModel extends Model
 {
     protected $table = 'appointments';
     protected $primaryKey = 'id';
+
+    protected $returnType = 'object';   // ← ADD THIS
 
     protected $allowedFields = [
         'admin_id',
@@ -23,3 +24,4 @@ class AppointmentModel extends Model
         'exit_time'
     ];
 }
+

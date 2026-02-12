@@ -69,50 +69,49 @@
                 <tbody>
                     <?php if (!empty($appointments)) : ?>
                         <?php foreach ($appointments as $row) : ?>
-                            <tr>
-                                <td><?= esc($row['name']) ?></td>
-                                <td><?= esc($row['mobile']) ?></td>
-                                <td><?= date('d M Y h:i A', strtotime($row['appointment_datetime'])) ?></td>
-                                <td><?= esc($row['purpose']) ?></td>
+<tr>
+    <td><?= esc($row->name) ?></td>
+    <td><?= esc($row->mobile) ?></td>
+    <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
+    <td><?= esc($row->purpose) ?></td>
 
-                             <td>
-                                <?php if (($row['entry_status'] ?? '') == 'Entered'): ?>
-                                    <span class="badge bg-success">Entered</span>
-                                <?php elseif (($row['entry_status'] ?? '') == 'Exited'): ?>
-                                    <span class="badge bg-secondary">Exited</span>
-                                <?php else: ?>
-                                    <span class="badge bg-warning">Waiting</span>
-                                <?php endif; ?>
-                                </td>
+    <td>
+        <?php if (($row->entry_status ?? '') == 'Entered'): ?>
+            <span class="badge bg-success">Entered</span>
+        <?php elseif (($row->entry_status ?? '') == 'Exited'): ?>
+            <span class="badge bg-secondary">Exited</span>
+        <?php else: ?>
+            <span class="badge bg-warning">Waiting</span>
+        <?php endif; ?>
+    </td>
 
-                                <td>
-                                <?= !empty($row['entry_time'])
-                                    ? date('d M Y h:i A', strtotime($row['entry_time']))
-                                    : '-' ?>
-                                </td>
+    <td>
+        <?= !empty($row->entry_time)
+            ? date('d M Y h:i A', strtotime($row->entry_time))
+            : '-' ?>
+    </td>
 
-                                <td>
-                                <?= !empty($row['exit_time'])
-                                    ? date('d M Y h:i A', strtotime($row['exit_time']))
-                                    : '-' ?>
-                                </td>
+    <td>
+        <?= !empty($row->exit_time)
+            ? date('d M Y h:i A', strtotime($row->exit_time))
+            : '-' ?>
+    </td>
 
-                                <td>
-                                    <?php if (($row['entry_status'] ?? '') == 'Entered'): ?>
-                                        <a href="<?= base_url('security/checkout/'.$row['id']) ?>"
-                                        class="btn btn-danger btn-sm">Check-Out</a>
+    <td>
+        <?php if (($row->entry_status ?? '') == 'Entered'): ?>
+            <a href="<?= base_url('security/checkout/'.$row->id) ?>"
+               class="btn btn-danger btn-sm">Check-Out</a>
 
-                                    <?php elseif (($row['entry_status'] ?? '') != 'Exited'): ?>
-                                        <a href="<?= base_url('security/checkin/'.$row['id']) ?>"
-                                        class="btn btn-success btn-sm">Check-In</a>
-                                    <?php else: ?>
-                                        -
-                                    <?php endif; ?>
+        <?php elseif (($row->entry_status ?? '') != 'Exited'): ?>
+            <a href="<?= base_url('security/checkin/'.$row->id) ?>"
+               class="btn btn-success btn-sm">Check-In</a>
+        <?php else: ?>
+            -
+        <?php endif; ?>
+    </td>
+</tr>
+<?php endforeach; ?>
 
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
                         <tr>
                             <td colspan="8" class="text-center">No approved visitors</td>
                         </tr>
