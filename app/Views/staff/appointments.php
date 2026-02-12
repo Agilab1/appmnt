@@ -6,8 +6,8 @@
 
     <div class="card">
         <div class="card-body p-0">
-
-            <table class="table table-bordered table-striped mb-0">
+             <table id="dtbl" class="table table-striped table-bordered">
+            <!-- <table class="table table-bordered table-striped mb-0"> -->
                 <thead class="table-primary">
                     <tr>
                         <th>Name</th>
@@ -68,3 +68,32 @@
 </div>
 
 <?= $this->endSection() ?>
+<?= $this->section('custom'); ?>
+<script>
+    $(function() {
+        $("#dtbl").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#dtbl_wrapper .col-md-6:eq(0)');
+
+        function closeWindow() {
+            window.close();
+        }
+
+
+
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,  
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });
+</script>
+<?= $this->endsection(); ?>
+

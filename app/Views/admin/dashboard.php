@@ -53,7 +53,7 @@
 
     <div class="card">
         <div class="card-body p-0">
-            <table class="table table-bordered table-striped mb-0">
+            <table id="dtbl" class="table table-striped table-bordered">
                 <thead class="table-primary">
                     <tr>
                         <th>Name</th>
@@ -67,36 +67,36 @@
 
                 <tbody>
                     <?php if (!empty($appointments)) : ?>
-                       <?php foreach ($appointments as $row) : ?>
-<tr>
-    <td><?= esc($row->name) ?></td>
-    <td><?= esc($row->mobile) ?></td>
-    <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
-    <td><?= esc($row->purpose) ?></td>
+                        <?php foreach ($appointments as $row) : ?>
+                            <tr>
+                                <td><?= esc($row->name) ?></td>
+                                <td><?= esc($row->mobile) ?></td>
+                                <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
+                                <td><?= esc($row->purpose) ?></td>
 
-    <td>
-        <?php if ($row->status == 'Pending'): ?>
-            <span class="badge bg-warning">Pending</span>
-        <?php elseif ($row->status == 'Approved'): ?>
-            <span class="badge bg-success">Approved</span>
-        <?php else: ?>
-            <span class="badge bg-danger">Rejected</span>
-        <?php endif; ?>
-    </td>
+                                <td>
+                                    <?php if ($row->status == 'Pending'): ?>
+                                        <span class="badge bg-warning">Pending</span>
+                                    <?php elseif ($row->status == 'Approved'): ?>
+                                        <span class="badge bg-success">Approved</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-danger">Rejected</span>
+                                    <?php endif; ?>
+                                </td>
 
-    <td>
-        <?php if ($row->status == 'Pending') : ?>
-            <a href="<?= base_url('admin/appointment/approve/'.$row->id) ?>"
-               class="btn btn-success btn-sm">Approve</a>
+                                <td>
+                                    <?php if ($row->status == 'Pending') : ?>
+                                        <a href="<?= base_url('admin/appointment/approve/' . $row->id) ?>"
+                                            class="btn btn-success btn-sm">Approve</a>
 
-            <a href="<?= base_url('admin/appointment/reject/'.$row->id) ?>"
-               class="btn btn-danger btn-sm">Reject</a>
-        <?php else: ?>
-            -
-        <?php endif; ?>
-    </td>
-</tr>
-<?php endforeach; ?>
+                                        <a href="<?= base_url('admin/appointment/reject/' . $row->id) ?>"
+                                            class="btn btn-danger btn-sm">Reject</a>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
 
                     <?php else: ?>
                         <tr>
@@ -117,3 +117,31 @@
 </div>
 
 <?= $this->endSection() ?>
+<?= $this->section('custom'); ?>
+<script>
+    $(function() {
+        $("#dtbl").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#dtbl_wrapper .col-md-6:eq(0)');
+
+        function closeWindow() {
+            window.close();
+        }
+
+
+
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });
+</script>
+<?= $this->endsection(); ?>

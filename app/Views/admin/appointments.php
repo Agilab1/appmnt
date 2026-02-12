@@ -11,7 +11,7 @@
 <div class="container mt-4">
     <h3>My Appointments</h3>
 
-    <table class="table table-bordered mt-3">
+     <table id="dtbl" class="table table-striped table-bordered">
         <thead class="table-primary">
             <tr>
                 <th>Name</th>
@@ -57,3 +57,33 @@
 </body>
 </html>
 <?= $this->endSection(); ?>
+
+<?= $this->section('custom'); ?>
+<script>
+    $(function() {
+        $("#dtbl").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#dtbl_wrapper .col-md-6:eq(0)');
+
+        function closeWindow() {
+            window.close();
+        }
+
+
+
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,  
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });
+</script>
+<?= $this->endsection(); ?>
+

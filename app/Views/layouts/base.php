@@ -64,6 +64,14 @@
     integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
     crossorigin="anonymous" />
 
+    <!-- DataTables (Bootstrap 5) -->
+  <link rel="stylesheet"
+    href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet"
+    href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+
+
+
 <style>
     body {
     overflow-x: auto;
@@ -131,6 +139,7 @@ body > .row {
   <?= $this->include('layouts/jscripts'); ?>
   <div class="row">
     <?= $this->renderSection('jscript'); ?>
+    <?= $this->renderSection('custom'); ?>
   </div>
 </body>
 <!--end::Body-->
