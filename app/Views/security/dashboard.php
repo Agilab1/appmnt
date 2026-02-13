@@ -78,9 +78,9 @@
 
     <td>
         <?php if (($row->entry_status ?? '') == 'Entered'): ?>
-            <span class="badge bg-success">Entered</span>
+            <span class="badge bg-success">checkin</span>
         <?php elseif (($row->entry_status ?? '') == 'Exited'): ?>
-            <span class="badge bg-secondary">Exited</span>
+            <span class="badge bg-secondary">checkout</span>
         <?php else: ?>
             <span class="badge bg-warning">Waiting</span>
         <?php endif; ?>
