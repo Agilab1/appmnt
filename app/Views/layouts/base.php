@@ -6,7 +6,7 @@
   <!-- <base href="http://agilesaptech.com/pms/"> -->
   <!-- <base href="http://localhost/appmnt/"> -->
   <base href="https://agilesaptech.com/appmnt/">
-
+<!--  -->
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Appointment Management System's - Dashboard</title>
   <!--begin::Accessibility Meta Tags-->
