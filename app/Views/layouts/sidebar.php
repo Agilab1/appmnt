@@ -7,29 +7,30 @@
     width: 280px;
     overflow-y: auto;
     overflow-x: hidden;
+    padding: 0 !important;
   }
-
   .app-main {
-    margin-left: 250px;
+    margin-left: 280px;
   }
-
   .sidebar-brand {
-    padding: 25px 10px 25px;
-    margin: 0;
-    text-align: center;
+    padding: 0 !important;
+    margin: 0 !important;
     border-bottom: none !important;
   }
   .brand-link {
     display: block;
     padding: 0 !important;
-    margin: 0;
-    border: none !important;
+    margin: 0 !important;
   }
   .sidebar-logo {
     width: 100%;
     height: auto;
     display: block;
+    border: 2px solid #343a40;
+  border-radius: 3px;
   }
+
+
 </style>
 <!--begin::Sidebar-->
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
@@ -48,7 +49,7 @@
 
         <a href="./index.html" class="brand-link text-center">
 
-          <img src="<?= base_url('public/assets/dist/assets/img/Appoitment.png'); ?>"
+          <img src="<?= base_url('public/assets/dist/assets/img/AppointmentUpdatedLOGO.png'); ?>"
             alt="Logo"
             class="sidebar-logo" />
 
