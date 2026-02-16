@@ -10,7 +10,7 @@
     padding: 0 !important;
   }
   .app-main {
-    margin-left: 280px;
+    margin-left: 250px;
   }
   .sidebar-brand {
     padding: 0 !important;
