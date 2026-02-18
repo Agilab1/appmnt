@@ -1,4 +1,17 @@
-      <!--begin::Footer-->
+<style>
+.app-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.app-main {
+    flex: 1;
+}
+.app-footer {
+    margin-left: 250px;
+}
+</style>
+     <!--begin::Footer-->
       <footer class="app-footer">
         <!--begin::Copyright-->
         <strong>
