@@ -73,7 +73,7 @@
 
 
 <style>
-    body {
+body {
     overflow-x: auto;
 }
 .app-wrapper,
@@ -89,7 +89,19 @@ body > .row {
     margin-left: 0;
     margin-right: 0;
 }
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    width: 100%;
+}
+.app-main {
+    margin-top: 70px;
+}
 </style>
+
 </head>
 <!--end::Head-->
 <!--begin::Body-->
