@@ -55,6 +55,7 @@
                  <!-- <table class="table table-bordered table-striped mb-0"> -->
                 <thead class="table-primary">
                     <tr>
+                        <th>Visitor ID</th>
                         <th>Name</th>
                         <th>Mobile</th>
                         <th>Appointment</th>
@@ -69,6 +70,7 @@
                     <?php if (!empty($appointments)) : ?>
                        <?php foreach ($appointments as $row) : ?>
 <tr>
+    <td><?= esc($row->visitor_id ?? '-') ?></td>
     <td><?= esc($row->name) ?></td>
     <td><?= esc($row->mobile) ?></td>
     <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
