@@ -89,53 +89,52 @@ class StaffController extends BaseController
     /*
     | STAFF DASHBOARD
     */
-    public function dashboard()
-    {
-        if (
-            ! session()->get('isLoggedIn') ||
-            session()->get('role') !== 'staff'
-        ) {
-            return redirect()->to('/login');
-        }
-
-        $empCode = session()->get('emp_code');
-        $model = new AppointmentModel();
-
-        $data = [
-
-            'total' => (new AppointmentModel())
-                ->where('emp_code', $empCode)
-                ->countAllResults(),
-
-            'pending' => (new AppointmentModel())
-                ->where([
-                    'emp_code' => $empCode,
-                    'status'   => 'Pending'
-                ])
-                ->countAllResults(),
-
-            'approved' => (new AppointmentModel())
-                ->where([
-                    'emp_code' => $empCode,
-                    'status'   => 'Approved'
-                ])
-                ->countAllResults(),
-
-            'rejected' => (new AppointmentModel())
-                ->where([
-                    'emp_code' => $empCode,
-                    'status'   => 'Rejected'
-                ])
-                ->countAllResults(),
-
-            'appointments' => (new AppointmentModel())
-                ->where('emp_code', $empCode)
-                ->orderBy('appointment_datetime', 'DESC')
-                ->findAll()
-        ];
-
-        return view('staff/dashboard', $data);
+     public function dashboard()
+{
+    // Role & Login Check (Same Logic)
+    if (
+        !session()->get('isLoggedIn') ||
+        session()->get('role') !== 'staff'
+    ) {
+        return redirect()->to('/login');
     }
+
+    $empCode = session()->get('emp_code');
+    $model   = new AppointmentModel();
+
+    // Get All Appointments For Staff
+    $appointments = $model
+        ->where('emp_code', $empCode)
+        ->orderBy('appointment_datetime', 'DESC')
+        ->findAll();
+
+    // Dashboard Counts
+    $data = [
+        'total' => $model->where('emp_code', $empCode)->countAllResults(),
+
+        'pending' => $model
+            ->where('emp_code', $empCode)
+            ->where('status', 'Pending')
+            ->countAllResults(),
+
+        'approved' => $model
+            ->where('emp_code', $empCode)
+            ->where('status', 'Approved')
+            ->countAllResults(),
+
+        'rejected' => $model
+            ->where('emp_code', $empCode)
+            ->where('status', 'Rejected')
+            ->countAllResults(),
+
+        // Send Full Appointment Data (includes visitor_id)
+        'appointments' => $appointments
+    ];
+
+    return view('staff/dashboard', $data);
+}
+
+
 
     public function logout()
     {
