@@ -99,6 +99,7 @@ class StaffController extends BaseController
         }
 
         $empCode = session()->get('emp_code');
+        $model = new AppointmentModel();
 
         $data = [
 
@@ -144,16 +145,168 @@ class StaffController extends BaseController
 
     public function approve($id)
     {
-        $model = new AppointmentModel();
+        $model = new \App\Models\AppointmentModel();
+        $appointment = $model->find($id);
+
+        if (!$appointment) {
+            return redirect()->back();
+        }
+
+        // Update status
         $model->update($id, ['status' => 'Approved']);
-        return redirect()->to('/staff/dashboard');
+
+        // Email Service
+        $emailService = \Config\Services::email();
+        $emailService->clear();
+
+        $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
+        $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
+
+        $emailService->setTo($appointment->email);
+        $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
+
+        $message = "
+            <h3>Dear {$appointment->name},</h3>
+
+            <p>Your appointment has been <strong>Approved</strong>.</p>
+
+           
+
+            <p>
+            <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
+            <strong>Date:</strong> {$appointmentDate}<br>
+            <strong>Time:</strong> {$appointmentTime}<br>
+            <strong>Location:</strong> AgiLabPlus InvenTech, Pune Office<br>
+            <strong>Person to Meet:</strong> {$appointment->emp_code}
+            </p>
+
+            
+
+            <h4>Important Instructions:</h4>
+
+            <ul>
+            <li>Please arrive at least <strong>10 minutes early</strong>.</li>
+            <li>Kindly carry a valid <strong>ID proof</strong>.</li>
+            <li>For any assistance, contact us at the number below.</li>
+            </ul>
+
+            
+
+            <p>
+            <strong>Contact Information:</strong><br>
+            Support Email:  sales@aiopcpl.in<br>
+            Phone: +91 8766941359
+            </p>
+
+            <br>
+
+            <p>
+            <strong>Regards </strong>,<br>
+            <strong>AgiLabPlus InvenTech</strong><br>
+            Office Club Bavdhan, Pune, Maharashtra-411071<br>
+            <strong>Website</strong>: www.aiopcpl.in
+            </p>
+            ";
+
+        $emailService->setMessage($message);
+        $emailService->send();
+
+        return redirect()->to('/admin/dashboard')
+            ->with('success', 'Appointment approved & email sent');
     }
 
     public function reject($id)
     {
-        $model = new AppointmentModel();
+        $model = new \App\Models\AppointmentModel();
+        $appointment = $model->find($id);
+
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
+
+        // Already processed check
+        if ($appointment->status != 'Pending') {
+            return redirect()->back();
+        }
+
+        // Update status
         $model->update($id, ['status' => 'Rejected']);
-        return redirect()->to('/staff/dashboard');
+
+        // Send Email
+        $emailService = \Config\Services::email();
+        $emailService->clear();
+
+        $emailService->setTo($appointment->email);
+        $emailService->setSubject('Appointment Rejected - ' . $appointment->name);
+
+        $message = "
+            <h3>Dear {$appointment->name},</h3>
+
+            <p>Your appointment has been <strong>Rejected</strong>.</p>
+
+            <p><strong>Appointment ID:</strong> {$appointment->visitor_id}</p>
+            <p><strong>Status:</strong> Rejected</p>
+
+            <p>You may book again if required.</p>
+
+            <br>
+            <p>Thank You,<br>
+            AgiLabPlus InvenTech</p>
+            ";
+
+        $emailService->setMessage($message);
+
+        if (!$emailService->send()) {
+            return redirect()->back()->with('error', 'Status updated but email failed');
+        }
+
+        return redirect()->to('/admin/dashboard')
+            ->with('success', 'Appointment rejected and email sent successfully');
+    }
+    private function sendStatusEmail($appointment, $status)
+    {
+        $emailService = \Config\Services::email();
+        $emailService->clear();
+
+        $userEmail = $appointment->email;
+        $userName  = $appointment->name;
+        $visitorId = $appointment->visitor_id;
+
+        // $appointmentDate = date('d M Y', strtotime($appointment['appointment_datetime']));
+        // $appointmentTime = date('h:i A', strtotime($appointment['appointment_datetime']));
+        $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
+        $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
+
+
+        $emailService->setTo($userEmail);
+
+        if ($status == 'Approved') {
+
+            $emailService->setSubject('Appointment Approved - AgiLabPlus');
+
+            $message = "
+        <h3>Dear $userName,</h3>
+        <p>Your appointment has been <b style='color:green;'>Approved</b>.</p>
+        <p><b>Appointment ID:</b> $visitorId</p>
+        <p><b>Date:</b> $appointmentDate</p>
+        <p><b>Time:</b> $appointmentTime</p>
+        <br>Thank You,<br>AgiLabPlus
+        ";
+        } else {
+
+            $emailService->setSubject('Appointment Rejected - AgiLabPlus');
+
+            $message = "
+        <h3>Dear $userName,</h3>
+        <p>Your appointment has been <b style='color:red;'>Rejected</b>.</p>
+        <p><b>Appointment ID:</b> $visitorId</p>
+        <br>You may book again if required.
+        <br><br>Thank You,<br>AgiLabPlus
+        ";
+        }
+
+        $emailService->setMessage($message);
+        $emailService->send();
     }
     public function save()
     {
@@ -207,7 +360,7 @@ class StaffController extends BaseController
         return redirect()->to('/admin/dashboard')->with('success', 'User created');
     }
 
-   public function update($id)
+    public function update($id)
     {
         if (session()->get('role') !== 'admin') {
             return redirect()->to('/login');
@@ -288,8 +441,7 @@ class StaffController extends BaseController
 
         /*
         | ADMIN DELETE
-        */
-        elseif (strpos($id, 'ADMIN-') === 0) {
+        */ elseif (strpos($id, 'ADMIN-') === 0) {
 
             $adminId = str_replace('ADMIN-', '', $id);
             (new \App\Models\AdminModel())->delete($adminId);
@@ -297,8 +449,7 @@ class StaffController extends BaseController
 
         /*
         | SECURITY DELETE
-        */
-        elseif (strpos($id, 'SEC-') === 0) {
+        */ elseif (strpos($id, 'SEC-') === 0) {
 
             $secId = str_replace('SEC-', '', $id);
             (new \App\Models\SecurityModel())->delete($secId);
@@ -325,8 +476,7 @@ class StaffController extends BaseController
 
         /*
         | ADMIN
-        */
-        elseif (strpos($id, 'ADMIN-') === 0) {
+        */ elseif (strpos($id, 'ADMIN-') === 0) {
             $adminId = str_replace('ADMIN-', '', $id);
             $admin = (new AdminModel())->find($adminId);
 
@@ -344,8 +494,7 @@ class StaffController extends BaseController
 
         /*
         | SECURITY
-        */
-        elseif (strpos($id, 'SEC-') === 0) {
+        */ elseif (strpos($id, 'SEC-') === 0) {
             $secId = str_replace('SEC-', '', $id);
             $sec = (new SecurityModel())->find($secId);
 
@@ -380,21 +529,21 @@ class StaffController extends BaseController
 
 
 
-        public function create()
-        {
-            if (session()->get('role') !== 'admin') {
-                return redirect()->to('/login');
-            }
-
-            return view('staff/staffForm', [
-                'mode' => 'create',
-                'types' => [
-                    'staff' => 'Staff',
-                    'security' => 'Security',
-                    'admin' => 'Admin'
-                ]
-            ]);
+    public function create()
+    {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/login');
         }
+
+        return view('staff/staffForm', [
+            'mode' => 'create',
+            'types' => [
+                'staff' => 'Staff',
+                'security' => 'Security',
+                'admin' => 'Admin'
+            ]
+        ]);
+    }
 
     public function list()
     {
@@ -421,7 +570,7 @@ class StaffController extends BaseController
         */
         foreach ($adminModel->findAll() as $row) {
             $staffs[] = (object)[
-                'emp_code' => 'ADMIN-'.$row->id,
+                'emp_code' => 'ADMIN-' . $row->id,
                 'first_nm' => $row->name,
                 'last_nm'  => '',
                 'email_id' => $row->email,
@@ -435,7 +584,7 @@ class StaffController extends BaseController
         */
         foreach ($securityModel->findAll() as $row) {
             $staffs[] = (object)[
-                'emp_code' => 'SEC-'.$row->id,
+                'emp_code' => 'SEC-' . $row->id,
                 'first_nm' => $row->name,
                 'last_nm'  => '',
                 'email_id' => $row->email_id,
@@ -448,10 +597,4 @@ class StaffController extends BaseController
 
         return view('staff/staffList', $data);
     }
-
-
-
-
-
-
 }

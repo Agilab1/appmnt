@@ -12,6 +12,7 @@ class AppointmentModel extends Model
 
     protected $allowedFields = [
         'admin_id',
+        'visitor_id',   
         'name',
         'emp_code',
         'mobile',

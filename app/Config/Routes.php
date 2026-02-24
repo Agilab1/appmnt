@@ -93,6 +93,10 @@ $routes->get('appointment/form/(:num)', 'Appointment::form/$1');
 $routes->post('appointment/submit', 'Appointment::submit');
 $routes->get('appointment/success', 'Appointment::success');
 
+// |appoiment QR
+$routes->get('appointment/qr/(:num)', 'Appointment::generateQR/$1');
+$routes->get('appointment/view/(:num)', 'Appointment::view/$1');
+
 /*
 | PROTECTED ROUTES
 */
@@ -107,23 +111,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->group('staff', function ($routes) {
 
         $routes->get('dashboard', 'StaffController::dashboard');
-
         // CREATE
         $routes->get('create', 'StaffController::create', ['filter' => 'admin']);
         $routes->post('save', 'StaffController::save', ['filter' => 'admin']);
-
         // VIEW FORM
       $routes->get('edit/(:any)', 'StaffController::edit/$1', ['filter' => 'admin']);
-
-
-
         // UPDATE
       $routes->post('update/(:any)', 'StaffController::update/$1', ['filter' => 'admin']);
-
-
         // DELETE
         $routes->get('delete/(:any)', 'StaffController::delete/$1', ['filter' => 'admin']);
-
         // APPOINTMENTS
         $routes->get('appointment/approve/(:num)', 'StaffController::approve/$1');
         $routes->get('appointment/reject/(:num)', 'StaffController::reject/$1');
@@ -135,8 +131,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->group('admin', function ($routes) {
         $routes->get('dashboard', 'AdminDashboard::index');
         $routes->get('appointments', 'AdminAppointments::index');
-        $routes->get('appointment/approve/(:num)', 'AdminAppointments::approve/$1');
-        $routes->get('appointment/reject/(:num)', 'AdminAppointments::reject/$1');
+        $routes->get('appointment/approve/(:num)', 'AdminDashboard::approve/$1');
+        $routes->get('appointment/reject/(:num)', 'AdminDashboard::reject/$1');
     });
 
     /*
