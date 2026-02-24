@@ -29,77 +29,95 @@ class AdminDashboard extends BaseController
 
         return view('admin/dashboard', $data);
     }
-    public function approve($id)
-    {
-        $model = new \App\Models\AppointmentModel();
-        $appointment = $model->find($id);
+   public function approve($id)
+{
+    $model = new \App\Models\AppointmentModel();
+    $appointment = $model->find($id);
 
-        if (!$appointment) {
-            return redirect()->back();
-        }
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found');
+    }
 
-        // Update status
-        $model->update($id, ['status' => 'Approved']);
+    // Update Status
+    $model->update($id, ['status' => 'Approved']);
 
-        // Email Service
-        $emailService = \Config\Services::email();
-        $emailService->clear();
+    // ===============================
+    // Fetch Staff Name using emp_code
+    // ===============================
+    $staffModel = new \App\Models\StaffModel();
+    $staff = $staffModel
+                ->where('emp_code', $appointment->emp_code)
+                ->first();
 
-        $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
-        $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
+    $staffName = $staff 
+        ? $staff->first_nm . ' ' . $staff->last_nm 
+        : 'Our Team Member';
 
-        $emailService->setTo($appointment->email);
-        $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
+    // ===============================
+    // Email Section
+    // ===============================
+    $emailService = \Config\Services::email();
+    $emailService->clear();
 
-        $message = "
-            <h3>Dear {$appointment->name},</h3>
+    $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
+    $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
 
-            <p>Your appointment has been <strong>Approved</strong>.</p>
+    $emailService->setTo($appointment->email);
+    $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
 
-           
+    $message = "
+        <h3>Dear {$appointment->name},</h3>
 
-            <p>
-            <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
-            <strong>Date:</strong> {$appointmentDate}<br>
-            <strong>Time:</strong> {$appointmentTime}<br>
-            <strong>Location:</strong> AgiLabPlus InvenTech, Pune Office<br>
-            <strong>Person to Meet:</strong> {$appointment->emp_code}
-            </p>
+        <p>Your appointment has been 
+        <strong >Approved</strong>.</p>
 
-            
+        <hr>
 
-            <h4>Important Instructions:</h4>
+        <p>
+        <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
+        <strong>Date:</strong> {$appointmentDate}<br>
+        <strong>Time:</strong> {$appointmentTime}<br>
+        <strong>Location:</strong> AgiLabPlus InvenTech, Pune Office<br>
+        <strong>Person to Meet:</strong> {$staffName}
+        </p>
 
-            <ul>
+        <hr>
+
+        <h4>Important Instructions:</h4>
+        <ul>
             <li>Please arrive at least <strong>10 minutes early</strong>.</li>
             <li>Kindly carry a valid <strong>ID proof</strong>.</li>
             <li>For any assistance, contact us at the number below.</li>
-            </ul>
+        </ul>
 
-            
+        <hr>
 
-            <p>
-            <strong>Contact Information:</strong><br>
-            Support Email:  sales@aiopcpl.in<br>
-            Phone: +91 8766941359
-            </p>
+        <p>
+        <strong>Contact Information:</strong><br>
+        Email: sales@aiopcpl.in<br>
+        Phone: +91 8766941359
+        </p>
 
-            <br>
+        <br>
 
-            <p>
-            <strong>Regards </strong>,<br>
-            <strong>AgiLabPlus InvenTech</strong><br>
-            Office Club Bavdhan, Pune, Maharashtra-411071<br>
-            <strong>Website</strong>: www.aiopcpl.in
-            </p>
-            ";
+        <p>
+        Regards,<br>
+        <strong>AgiLabPlus InvenTech</strong><br>
+        Office Club Bavdhan, Pune, Maharashtra - 411071<br>
+        Website: www.aiopcpl.in
+        </p>
+    ";
 
-        $emailService->setMessage($message);
-        $emailService->send();
+    $emailService->setMessage($message);
 
-        return redirect()->to('/admin/dashboard')
-            ->with('success', 'Appointment approved & email sent');
+    if (!$emailService->send()) {
+        return redirect()->back()
+            ->with('error', 'Status updated but email failed');
     }
+
+    return redirect()->back()
+        ->with('success', 'Appointment approved and email sent successfully');
+}
     public function reject($id)
     {
         $model = new \App\Models\AppointmentModel();
