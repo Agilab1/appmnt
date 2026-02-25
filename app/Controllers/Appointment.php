@@ -44,6 +44,7 @@ class Appointment extends BaseController
             ->where("DATE(appointment_datetime)", $selectedDate)
             ->findAll();
 
+
         $data['bookedSlots'] = $bookedSlots;
 
         // ====================================================
@@ -237,13 +238,27 @@ class Appointment extends BaseController
     }
 
 
-    public function view($id)
-    {
-        $model = new AppointmentModel();
-        $data['appointment'] = $model->find($id);
+    
 
-        return view('appointment/view_readonly', $data);
+    public function view($id)
+{
+    $model = new AppointmentModel();
+    $staffModel = new StaffModel();
+
+    $appointment = $model->find($id);
+
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found');
     }
+
+    $data['appointment'] = $appointment;
+    $data['admin_id'] = $appointment->admin_id;
+    $data['staffs'] = $staffModel->where('status', 1)->findAll();
+    $data['mode'] = 'view';
+
+    return view('appointment/form', $data);   // ✅ CHANGE HERE
+}
+
 
 
 
@@ -252,4 +267,82 @@ class Appointment extends BaseController
     {
         return "Appointment request submitted successfully!";
     }
+
+    // EDIT FORM
+    public function edit($id)
+    {
+        $appointmentModel = new AppointmentModel();
+        $staffModel = new StaffModel();
+
+        $appointment = $appointmentModel->find($id);
+
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
+
+        $data['appointment'] = $appointment;
+       $data['admin_id'] = $appointment->admin_id;
+        $data['staffs'] = $staffModel->where('status', 1)->findAll();
+        $data['mode'] = 'edit';
+
+        return view('appointment/form', $data);
+    }
+
+    public function update($id)
+    {
+        $model = new AppointmentModel();
+
+        $appointment = $model->find($id);
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
+
+        $date = $this->request->getPost('appointment_date');
+        $time = $this->request->getPost('appointment_time');
+
+        $datetime = date('Y-m-d H:i:s', strtotime("$date $time"));
+
+        $durationHour   = $this->request->getPost('duration_hour');
+        $durationMinute = $this->request->getPost('duration_minute');
+
+        $totalMinutes = ((int)$durationHour * 60) + (int)$durationMinute;
+
+        $endDateTime = date(
+            'Y-m-d H:i:s',
+            strtotime($datetime . " +$totalMinutes minutes")
+        );
+
+        $model->update($id, [
+            'emp_code' => $this->request->getPost('emp_code'),
+            'name'     => $this->request->getPost('name'),
+            'mobile'   => $this->request->getPost('mobile'),
+            'email'    => $this->request->getPost('email'),
+            'appointment_datetime' => $datetime,
+            'end_datetime' => $endDateTime,
+            'duration_hour' => $durationHour,
+            'duration_minute' => $durationMinute,
+            'purpose'  => $this->request->getPost('purpose'),
+        ]);
+
+        return redirect()->to(base_url('appointment/view/'.$id))
+            ->with('success', 'Appointment updated successfully');
+    }
+    // public function view($id)
+    // {
+    //     $model = new AppointmentModel();
+    //     $staffModel = new StaffModel();
+
+    //     $appointment = $model->find($id);
+
+    //     if (!$appointment) {
+    //         return redirect()->back()->with('error', 'Appointment not found');
+    //     }
+
+    //     $data['appointment'] = $appointment;
+    //     $data['admin_id'] = $appointment['admin_id'];
+    //     $data['staffs'] = $staffModel->where('status', 1)->findAll();
+    //     $data['mode'] = 'view';
+
+    //     return view('appointment/form', $data);
+    // }    
 }

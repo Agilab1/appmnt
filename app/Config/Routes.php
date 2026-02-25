@@ -96,7 +96,8 @@ $routes->get('appointment/success', 'Appointment::success');
 // |appoiment QR
 $routes->get('appointment/qr/(:num)', 'Appointment::generateQR/$1');
 $routes->get('appointment/view/(:num)', 'Appointment::view/$1');
-
+$routes->get('appointment/edit/(:num)', 'Appointment::edit/$1');
+$routes->post('appointment/update/(:num)', 'Appointment::update/$1');
 /*
 | PROTECTED ROUTES
 */
