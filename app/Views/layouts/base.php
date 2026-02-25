@@ -6,7 +6,7 @@
   <!-- <base href="http://agilesaptech.com/pms/"> -->
   <!-- <base href="http://localhost/appmnt/"> -->
   <base href="https://agilesaptech.com/appmnt/">
-<!--  -->
+  <!--  -->
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Appointment Management System's - Dashboard</title>
   <!--begin::Accessibility Meta Tags-->
@@ -64,43 +64,52 @@
     integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
     crossorigin="anonymous" />
 
-    <!-- DataTables (Bootstrap 5) -->
+  <!-- DataTables (Bootstrap 5) -->
   <link rel="stylesheet"
     href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet"
     href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
 
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 
-<style>
-body {
-    overflow-x: auto;
-}
-.app-wrapper,
-.app-main {
-    max-width: 100%;
-    overflow-x: hidden;
-}
-.app-main > .row {
-    margin-left: 0;
-    margin-right: 0;
-}
-body > .row {
-    margin-left: 0;
-    margin-right: 0;
-}
-.app-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1030;
-    width: 100%;
-}
-.app-main {
-    margin-top: 70px;
-}
-</style>
+
+
+  <style>
+    body {
+      overflow-x: auto;
+    }
+
+    .app-wrapper,
+    .app-main {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .app-main>.row {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    body>.row {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1030;
+      width: 100%;
+    }
+
+    .app-main {
+      margin-top: 70px;
+    }
+  </style>
 
 </head>
 <!--end::Head-->

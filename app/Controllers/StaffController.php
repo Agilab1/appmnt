@@ -89,52 +89,72 @@ class StaffController extends BaseController
     /*
     | STAFF DASHBOARD
     */
-     public function dashboard()
-{
-    // Role & Login Check (Same Logic)
-    if (
-        !session()->get('isLoggedIn') ||
-        session()->get('role') !== 'staff'
-    ) {
-        return redirect()->to('/login');
+    public function dashboard()
+    {
+        if (!session()->get('isLoggedIn') || session()->get('role') !== 'staff') {
+            return redirect()->to('/login');
+        }
+
+        $empCode = session()->get('emp_code');
+        $appointmentModel = new AppointmentModel();
+
+        // COUNT CARDS
+        $total = $appointmentModel->where('emp_code', $empCode)->countAllResults();
+
+        $pending = $appointmentModel->where([
+            'emp_code' => $empCode,
+            'status'   => 'Pending'
+        ])->countAllResults();
+
+        $approved = $appointmentModel->where([
+            'emp_code' => $empCode,
+            'status'   => 'Approved'
+        ])->countAllResults();
+
+        $rejected = $appointmentModel->where([
+            'emp_code' => $empCode,
+            'status'   => 'Rejected'
+        ])->countAllResults();
+
+        // APPOINTMENTS
+        $appointments = $appointmentModel
+            ->where('emp_code', $empCode)
+            ->orderBy('appointment_datetime', 'DESC')
+            ->findAll();
+
+        /*
+        ==================================================
+        🔥 FULLCALENDAR FIX (IMPORTANT)
+        ==================================================
+        */
+        $events = [];
+
+        foreach ($appointments as $row) {
+
+            $events[] = [
+                'id'    => $row->id,
+                'title' => $row->name,
+                'start' => date('c', strtotime($row->appointment_datetime)),
+                'extendedProps' => [
+                    'mobile' => $row->mobile,
+                    'purpose' => $row->purpose,
+                    'status' => $row->status,
+                    'time' => date('h:i A', strtotime($row->appointment_datetime))
+                ],
+                'backgroundColor' => $row->status == 'Approved' ? '#28a745' : ($row->status == 'Pending' ? '#ffc107' : '#dc3545')
+            ];
+        }
+        $data = [
+            'total'          => $total,
+            'pending'        => $pending,
+            'approved'       => $approved,
+            'rejected'       => $rejected,
+            'appointments'   => $appointments,
+            'calendarEvents' => json_encode($events)
+        ];
+
+        return view('staff/dashboard', $data);
     }
-
-    $empCode = session()->get('emp_code');
-    $model   = new AppointmentModel();
-
-    // Get All Appointments For Staff
-    $appointments = $model
-        ->where('emp_code', $empCode)
-        ->orderBy('appointment_datetime', 'DESC')
-        ->findAll();
-
-    // Dashboard Counts
-    $data = [
-        'total' => $model->where('emp_code', $empCode)->countAllResults(),
-
-        'pending' => $model
-            ->where('emp_code', $empCode)
-            ->where('status', 'Pending')
-            ->countAllResults(),
-
-        'approved' => $model
-            ->where('emp_code', $empCode)
-            ->where('status', 'Approved')
-            ->countAllResults(),
-
-        'rejected' => $model
-            ->where('emp_code', $empCode)
-            ->where('status', 'Rejected')
-            ->countAllResults(),
-
-        // Send Full Appointment Data (includes visitor_id)
-        'appointments' => $appointments
-    ];
-
-    return view('staff/dashboard', $data);
-}
-
-
 
     public function logout()
     {
@@ -143,45 +163,45 @@ class StaffController extends BaseController
     }
 
     public function approve($id)
-{
-    $model = new \App\Models\AppointmentModel();
-    $appointment = $model->find($id);
+    {
+        $model = new \App\Models\AppointmentModel();
+        $appointment = $model->find($id);
 
-    if (!$appointment) {
-        return redirect()->back()->with('error', 'Appointment not found');
-    }
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
 
-    // Update Status
-    $model->update($id, ['status' => 'Approved']);
+        // Update Status
+        $model->update($id, ['status' => 'Approved']);
 
-    // ===============================
-    // Fetch Staff Name using emp_code
-    // ===============================
-    $staffModel = new \App\Models\StaffModel();
-    $staff = $staffModel
-                ->where('emp_code', $appointment->emp_code)
-                ->first();
+        // ===============================
+        // Fetch Staff Name using emp_code
+        // ===============================
+        $staffModel = new \App\Models\StaffModel();
+        $staff = $staffModel
+            ->where('emp_code', $appointment->emp_code)
+            ->first();
 
-    $staffName = $staff 
-        ? $staff->first_nm . ' ' . $staff->last_nm 
-        : 'Our Team Member';
+        $staffName = $staff
+            ? $staff->first_nm . ' ' . $staff->last_nm
+            : 'Our Team Member';
 
-    // ===============================
-    // Email Section
-    // ===============================
-    $emailService = \Config\Services::email();
-    $emailService->clear();
+        // ===============================
+        // Email Section
+        // ===============================
+        $emailService = \Config\Services::email();
+        $emailService->clear();
 
-    $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
-    $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
+        $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
+        $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
 
-    $emailService->setTo($appointment->email);
-    $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
+        $emailService->setTo($appointment->email);
+        $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
 
-    $message = "
+        $message = "
         <h3>Dear {$appointment->name},</h3>
 
-        <p>Your appointment has been 
+        <p>Your appointment has been
         <strong style='color:green;'>Approved</strong>.</p>
 
         <hr>
@@ -221,16 +241,16 @@ class StaffController extends BaseController
         </p>
     ";
 
-    $emailService->setMessage($message);
+        $emailService->setMessage($message);
 
-    if (!$emailService->send()) {
+        if (!$emailService->send()) {
+            return redirect()->back()
+                ->with('error', 'Status updated but email failed');
+        }
+
         return redirect()->back()
-            ->with('error', 'Status updated but email failed');
+            ->with('success', 'Appointment approved and email sent successfully');
     }
-
-    return redirect()->back()
-        ->with('success', 'Appointment approved and email sent successfully');
-}
 
     public function reject($id)
     {

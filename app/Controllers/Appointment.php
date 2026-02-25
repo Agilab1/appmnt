@@ -10,17 +10,26 @@ class Appointment extends BaseController
 {
     public function form($admin_id)
     {
-        $staffModel = new StaffModel();
+        $staffModel       = new \App\Models\StaffModel();
         $appointmentModel = new \App\Models\AppointmentModel();
 
         $data['admin_id'] = $admin_id;
 
-        // Staff logic same as before
+        /*
+    |--------------------------------------------------------------------------
+    | Staff List (Same as before)
+    |--------------------------------------------------------------------------
+    */
         $data['staffs'] = $staffModel
             ->where('status', 1)
             ->findAll();
 
-        // 🔹 Auto Visitor ID Logic (Same As Yours)
+
+        /*
+    |--------------------------------------------------------------------------
+    | Auto Visitor ID Logic (UNCHANGED)
+    |--------------------------------------------------------------------------
+    */
 
         $today = date('Ymd');
 
@@ -32,23 +41,32 @@ class Appointment extends BaseController
 
         $data['visitor_id'] = $today . $nextNumber;
 
-        // ====================================================
-        // 🔥 NEW LOGIC ADDED (Booked Slots Fetch)
-        // ====================================================
 
-        $selectedDate = date('Y-m-d'); // default today
+        /*
+    |--------------------------------------------------------------------------
+    | 🔥 NEW LOGIC – Fetch All Booked Slots (NOT Only Today)
+    |--------------------------------------------------------------------------
+    | So JS can check availability dynamically
+    |--------------------------------------------------------------------------
+    */
 
-        $bookedSlots = $appointmentModel
-            ->select("HOUR(appointment_datetime) as hour,
-                  MINUTE(appointment_datetime) as minute")
-            ->where("DATE(appointment_datetime)", $selectedDate)
+        $appointments = $appointmentModel
+            ->select('appointment_datetime')
+            ->where('status !=', 'Rejected')
             ->findAll();
 
+        $bookedSlots = [];
 
-        $data['bookedSlots'] = $bookedSlots;
+        foreach ($appointments as $row) {
+            $bookedSlots[] = date('Y-m-d H:i', strtotime($row->appointment_datetime));
+        }
 
-        // ====================================================
+        $data['bookedSlots'] = json_encode($bookedSlots);
 
+
+        /*
+    |--------------------------------------------------------------------------
+    */
         return view('appointment/form', $data);
     }
 
@@ -154,7 +172,7 @@ class Appointment extends BaseController
                 ->with('error', 'This time slot overlaps with another booking');
         }
 
-        
+
 
         $model->insert([
             'admin_id' => $this->request->getPost('admin_id'),
@@ -217,7 +235,7 @@ class Appointment extends BaseController
         //     echo $emailService->printDebugger(['headers']);
         //     die;
         // }
-        //  end here confirmation mail 
+        //  end here confirmation mail
 
         session()->setFlashdata(
             'success',
@@ -227,7 +245,7 @@ class Appointment extends BaseController
 
         return redirect()->back();
     }
-     public function generateQR($id)
+    public function generateQR($id)
     {
         $url = base_url('appointment/view/' . $id);
 
@@ -238,26 +256,26 @@ class Appointment extends BaseController
     }
 
 
-    
+
 
     public function view($id)
-{
-    $model = new AppointmentModel();
-    $staffModel = new StaffModel();
+    {
+        $model = new AppointmentModel();
+        $staffModel = new StaffModel();
 
-    $appointment = $model->find($id);
+        $appointment = $model->find($id);
 
-    if (!$appointment) {
-        return redirect()->back()->with('error', 'Appointment not found');
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
+
+        $data['appointment'] = $appointment;
+        $data['admin_id'] = $appointment->admin_id;
+        $data['staffs'] = $staffModel->where('status', 1)->findAll();
+        $data['mode'] = 'view';
+
+        return view('appointment/form', $data);   // ✅ CHANGE HERE
     }
-
-    $data['appointment'] = $appointment;
-    $data['admin_id'] = $appointment->admin_id;
-    $data['staffs'] = $staffModel->where('status', 1)->findAll();
-    $data['mode'] = 'view';
-
-    return view('appointment/form', $data);   // ✅ CHANGE HERE
-}
 
 
 
@@ -281,7 +299,7 @@ class Appointment extends BaseController
         }
 
         $data['appointment'] = $appointment;
-       $data['admin_id'] = $appointment->admin_id;
+        $data['admin_id'] = $appointment->admin_id;
         $data['staffs'] = $staffModel->where('status', 1)->findAll();
         $data['mode'] = 'edit';
 
@@ -324,7 +342,7 @@ class Appointment extends BaseController
             'purpose'  => $this->request->getPost('purpose'),
         ]);
 
-        return redirect()->to(base_url('appointment/view/'.$id))
+        return redirect()->to(base_url('appointment/view/' . $id))
             ->with('success', 'Appointment updated successfully');
     }
     // public function view($id)
@@ -344,5 +362,5 @@ class Appointment extends BaseController
     //     $data['mode'] = 'view';
 
     //     return view('appointment/form', $data);
-    // }    
+    // }
 }
