@@ -119,6 +119,7 @@ $appointment = $appointment ?? null;
                         <div class="mb-3">
                             <div class="row">
 
+                                <!-- Time -->
                                 <div class="col-md-6">
                                     <label class="form-label">Time</label>
                                     <input type="text"
@@ -132,6 +133,7 @@ $appointment = $appointment ?? null;
                                         required>
                                 </div>
 
+                                <!-- Duration -->
                                 <div class="col-md-6">
                                     <label class="form-label">Duration</label>
                                     <div class="inline-wrapper">
@@ -150,8 +152,8 @@ $appointment = $appointment ?? null;
                                             name="duration_minute"
                                             class="form-control spinner-input"
                                             min="0"
-                                            max="30"
-                                            step="30"
+                                            max="45"
+                                            step="15"
                                             value="<?= $appointment->duration_minute ?? 0 ?>"
                                             <?= $isView ? 'readonly' : '' ?>
                                             required>
@@ -212,11 +214,12 @@ $appointment = $appointment ?? null;
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
 flatpickr("#appointment_date", { dateFormat: "Y-m-d" });
+
 flatpickr("#appointment_time", {
     enableTime: true,
     noCalendar: true,
     dateFormat: "h:i K",
-    minuteIncrement: 30
+    minuteIncrement: 15
 });
 </script>
 <?php endif; ?>
