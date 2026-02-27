@@ -3,7 +3,6 @@
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
 <style>
-
     #calendarModal .modal-content {
         border-radius: 1.25rem;
         overflow: hidden;
@@ -93,6 +92,7 @@
                 <!-- <table class="table table-bordered table-striped mb-0"> -->
                 <thead class="table-primary">
                     <tr>
+                        <th>Visitor ID</th>
                         <th>Name</th>
                         <th>Mobile</th>
                         <th>Appointment</th>
@@ -104,9 +104,14 @@
                 </thead>
 
                 <tbody>
-                    <?php if (!empty($appointments)) : ?>
-                        <?php foreach ($appointments as $row) : ?>
+                    <?php if (!empty($appointments)): ?>
+                        <?php foreach ($appointments as $row): ?>
                             <tr>
+                                <td>
+                                    <a href="<?= base_url('appointment/view/' . $row->id) ?>">
+                                        <?= esc($row->visitor_id) ?>
+                                    </a>
+                                </td>
                                 <td><?= esc($row->name) ?></td>
                                 <td><?= esc($row->mobile) ?></td>
                                 <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
@@ -173,7 +178,7 @@
 <script>
     let calendar;
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
 
 
 
@@ -207,7 +212,7 @@
         }
 
     });
-    document.addEventListener('shown.bs.modal', function(event) {
+    document.addEventListener('shown.bs.modal', function (event) {
 
         if (event.target.id === 'calendarModal') {
 
