@@ -29,8 +29,103 @@ class AdminDashboard extends BaseController
 
         return view('admin/dashboard', $data);
     }
-   public function approve($id)
+    //    public function approve($id)
+    // {
+    //     $model = new \App\Models\AppointmentModel();
+    //     $appointment = $model->find($id);
+
+    //     if (!$appointment) {
+    //         return redirect()->back()->with('error', 'Appointment not found');
+    //     }
+
+    //     // Update Status
+    //     $model->update($id, ['status' => 'Approved']);
+
+    //     // ===============================
+    //     // Fetch Staff Name using emp_code
+    //     // ===============================
+    //     $staffModel = new \App\Models\StaffModel();
+    //     $staff = $staffModel
+    //                 ->where('emp_code', $appointment->emp_code)
+    //                 ->first();
+
+    //     $staffName = $staff 
+    //         ? $staff->first_nm . ' ' . $staff->last_nm 
+    //         : 'Our Team Member';
+
+    //     // ===============================
+    //     // Email Section
+    //     // ===============================
+    //     $emailService = \Config\Services::email();
+    //     $emailService->clear();
+
+    //     $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
+    //     $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
+
+    //     $emailService->setTo($appointment->email);
+    //     $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
+
+    //     $message = "
+    //         <h3>Dear {$appointment->name},</h3>
+
+    //         <p>Your appointment has been 
+    //         <strong >Approved</strong>.</p>
+
+    //         <hr>
+
+    //         <p>
+    //         <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
+    //         <strong>Date:</strong> {$appointmentDate}<br>
+    //         <strong>Time:</strong> {$appointmentTime}<br>
+    //         <strong>Location:</strong> AgiLabPlus InvenTech, Pune Office<br>
+    //         <strong>Person to Meet:</strong> {$staffName}
+    //         </p>
+
+    //         <hr>
+
+    //         <h4>Important Instructions:</h4>
+    //         <ul>
+    //             <li>Please arrive at least <strong>10 minutes early</strong>.</li>
+    //             <li>Kindly carry a valid <strong>ID proof</strong>.</li>
+    //             <li>For any assistance, contact us at the number below.</li>
+    //         </ul>
+
+    //         <hr>
+
+    //         <p>
+    //         <strong>Contact Information:</strong><br>
+    //         Email: sales@aiopcpl.in<br>
+    //         Phone: +91 8766941359
+    //         </p>
+
+    //         <br>
+
+    //         <p>
+    //         Regards,<br>
+    //         <strong>AgiLabPlus InvenTech</strong><br>
+    //         Office Club Bavdhan, Pune, Maharashtra - 411071<br>
+    //         Website: www.aiopcpl.in
+    //         </p>
+    //     ";
+
+    //     $emailService->setMessage($message);
+
+    //     if (!$emailService->send()) {
+    //         return redirect()->back()
+    //             ->with('error', 'Status updated but email failed');
+    //     }
+
+    //     return redirect()->back()
+    //         ->with('success', 'Appointment approved and email sent successfully');
+    // }
+
+    public function approve($id)
 {
+    // 🔒 LOGIN + ROLE CHECK
+    if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
+        return redirect()->to('/login');
+    }
+
     $model = new \App\Models\AppointmentModel();
     $appointment = $model->find($id);
 
@@ -38,24 +133,22 @@ class AdminDashboard extends BaseController
         return redirect()->back()->with('error', 'Appointment not found');
     }
 
-    // Update Status
+    // 🔒 Status check
+    if ($appointment->status !== 'Pending') {
+        return redirect()->back()->with('error', 'Invalid action');
+    }
+
+    // Update status
     $model->update($id, ['status' => 'Approved']);
 
-    // ===============================
-    // Fetch Staff Name using emp_code
-    // ===============================
+    // Fetch staff name
     $staffModel = new \App\Models\StaffModel();
-    $staff = $staffModel
-                ->where('emp_code', $appointment->emp_code)
-                ->first();
+    $staff = $staffModel->where('emp_code', $appointment->emp_code)->first();
 
-    $staffName = $staff 
-        ? $staff->first_nm . ' ' . $staff->last_nm 
+    $staffName = $staff
+        ? $staff->first_nm . ' ' . $staff->last_nm
         : 'Our Team Member';
 
-    // ===============================
-    // Email Section
-    // ===============================
     $emailService = \Config\Services::email();
     $emailService->clear();
 
@@ -65,48 +158,48 @@ class AdminDashboard extends BaseController
     $emailService->setTo($appointment->email);
     $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
 
-    $message = "
-        <h3>Dear {$appointment->name},</h3>
+     $message = "
+             <h3>Dear {$appointment->name},</h3>
 
-        <p>Your appointment has been 
-        <strong >Approved</strong>.</p>
+             <p>Your appointment has been 
+             <strong >Approved</strong>.</p>
 
-        <hr>
+             
 
-        <p>
-        <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
-        <strong>Date:</strong> {$appointmentDate}<br>
-        <strong>Time:</strong> {$appointmentTime}<br>
-        <strong>Location:</strong> AgiLabPlus InvenTech, Pune Office<br>
-        <strong>Person to Meet:</strong> {$staffName}
-        </p>
+             <p>
+             <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
+             <strong>Date:</strong> {$appointmentDate}<br>
+             <strong>Time:</strong> {$appointmentTime}<br>
+             <strong>Location:</strong> AgiLabPlus InvenTech, Pune Office<br>
+             <strong>Person to Meet:</strong> {$staffName}
+             </p>
 
-        <hr>
+             
 
-        <h4>Important Instructions:</h4>
-        <ul>
-            <li>Please arrive at least <strong>10 minutes early</strong>.</li>
-            <li>Kindly carry a valid <strong>ID proof</strong>.</li>
-            <li>For any assistance, contact us at the number below.</li>
-        </ul>
+             <h4>Important Instructions:</h4>
+             <ul>
+                 <li>Please arrive at least <strong>10 minutes early</strong>.</li>
+                 <li>Kindly carry a valid <strong>ID proof</strong>.</li>
+                 <li>For any assistance, contact us at the number below.</li>
+             </ul>
 
-        <hr>
+             
 
-        <p>
-        <strong>Contact Information:</strong><br>
-        Email: sales@aiopcpl.in<br>
-        Phone: +91 8766941359
-        </p>
+             <p>
+             <strong>Contact Information:</strong><br>
+             Email: sales@aiopcpl.in<br>
+             Phone: +91 8766941359
+             </p>
 
-        <br>
+             <br>
 
-        <p>
-        Regards,<br>
-        <strong>AgiLabPlus InvenTech</strong><br>
-        Office Club Bavdhan, Pune, Maharashtra - 411071<br>
-        Website: www.aiopcpl.in
-        </p>
-    ";
+             <p>
+             Regards,<br>
+             <strong>AgiLabPlus InvenTech</strong><br>
+             Office Club Bavdhan, Pune, Maharashtra - 411071<br>
+             Website: www.aiopcpl.in
+             </p>
+         ";
 
     $emailService->setMessage($message);
 
@@ -118,52 +211,110 @@ class AdminDashboard extends BaseController
     return redirect()->back()
         ->with('success', 'Appointment approved and email sent successfully');
 }
-    public function reject($id)
-    {
-        $model = new \App\Models\AppointmentModel();
-        $appointment = $model->find($id);
+    // public function reject($id)
+    // {
+    //     $model = new \App\Models\AppointmentModel();
+    //     $appointment = $model->find($id);
 
-        if (!$appointment) {
-            return redirect()->back()->with('error', 'Appointment not found');
-        }
+    //     if (!$appointment) {
+    //         return redirect()->back()->with('error', 'Appointment not found');
+    //     }
 
-        // Already processed check
-        if ($appointment->status != 'Pending') {
-            return redirect()->back();
-        }
+    //     // Already processed check
+    //     if ($appointment->status != 'Pending') {
+    //         return redirect()->back();
+    //     }
 
-        // Update status
-        $model->update($id, ['status' => 'Rejected']);
+    //     // Update status
+    //     $model->update($id, ['status' => 'Rejected']);
 
-        // Send Email
-        $emailService = \Config\Services::email();
-        $emailService->clear();
+    //     // Send Email
+    //     $emailService = \Config\Services::email();
+    //     $emailService->clear();
 
-        $emailService->setTo($appointment->email);
-        $emailService->setSubject('Appointment Rejected - ' . $appointment->name);
+    //     $emailService->setTo($appointment->email);
+    //     $emailService->setSubject('Appointment Rejected - ' . $appointment->name);
 
-        $message = "
-            <h3>Dear {$appointment->name},</h3>
+    //     $message = "
+    //         <h3>Dear {$appointment->name},</h3>
 
-            <p>Your appointment has been <strong style='color:red;'>Rejected</strong>.</p>
+    //         <p>Your appointment has been <strong style='color:red;'>Rejected</strong>.</p>
 
-            <p><strong>Appointment ID:</strong> {$appointment->visitor_id}</p>
-            <p><strong>Status:</strong> Rejected</p>
+    //         <p><strong>Appointment ID:</strong> {$appointment->visitor_id}</p>
+    //         <p><strong>Status:</strong> Rejected</p>
 
-            <p>You may book again if required.</p>
+    //         <p>You may book again if required.</p>
 
-            <br>
-            <p>Thank You,<br>
-            AgiLabPlus InvenTech</p>
-            ";
+    //         <br>
+    //         <p>Thank You,<br>
+    //         AgiLabPlus InvenTech</p>
+    //         ";
 
-        $emailService->setMessage($message);
+    //     $emailService->setMessage($message);
 
-        if (!$emailService->send()) {
-            return redirect()->back()->with('error', 'Status updated but email failed');
-        }
+    //     if (!$emailService->send()) {
+    //         return redirect()->back()->with('error', 'Status updated but email failed');
+    //     }
 
-        return redirect()->to('/admin/dashboard')
-            ->with('success', 'Appointment rejected and email sent successfully');
+    //     return redirect()->to('/admin/dashboard')
+    //         ->with('success', 'Appointment rejected and email sent successfully');
+    // }
+
+   public function reject($id)
+{
+    if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
+        return redirect()->to('/login');
     }
+
+    $model = new \App\Models\AppointmentModel();
+    $appointment = $model->find($id);
+
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found');
+    }
+
+    if ($appointment->status !== 'Pending') {
+        return redirect()->back()->with('error', 'Invalid action');
+    }
+
+    // update status
+    $model->update($id, ['status' => 'Rejected']);
+
+    // Email service
+    $emailService = \Config\Services::email();
+    $emailService->clear();
+
+    $emailService->setTo($appointment->email);
+    $emailService->setSubject("Appointment Rejected | AgiLabPlus InvenTech");
+
+    $message = "
+        <h3>Dear {$appointment->name},</h3>
+
+        <p>Your appointment has been 
+        <strong style='color:red;'>Rejected</strong>.</p>
+
+        <p>
+        <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
+        <strong>Status:</strong> Rejected
+        </p>
+
+        <p>You may book another appointment if needed.</p>
+
+        <br>
+
+        <p>
+        Regards,<br>
+        <strong>AgiLabPlus InvenTech</strong>
+        </p>
+    ";
+
+    $emailService->setMessage($message);
+
+    if (!$emailService->send()) {
+        return redirect()->back()->with('error', 'Status updated but email failed');
+    }
+
+    return redirect()->back()
+        ->with('success', 'Appointment rejected and email sent successfully');
+}
 }
