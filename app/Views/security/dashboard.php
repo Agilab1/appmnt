@@ -56,6 +56,7 @@
             <table id="dtbl" class="table table-striped table-bordered">
                 <thead class="table-primary">
                     <tr>
+                        <th>Visitor ID</th>
                         <th>Name</th>
                         <th>Mobile</th>
                         <th>Appointment</th>
@@ -71,6 +72,11 @@
                     <?php if (!empty($appointments)) : ?>
                         <?php foreach ($appointments as $row) : ?>
                             <tr>
+                                <td>
+                                    <a href="<?= base_url('appointment/view/' . $row->id) ?>">
+                                        <?= esc($row->visitor_id) ?>
+                                    </a>
+                                </td>
                                 <td><?= esc($row->name) ?></td>
                                 <td><?= esc($row->mobile) ?></td>
                                 <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
