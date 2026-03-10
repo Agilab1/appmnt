@@ -101,7 +101,6 @@ class SecurityController extends BaseController
             'entry_time'   => date('Y-m-d H:i:s')
         ]);
 
-        return redirect()->to('/security/dashboard')
-            ->with('success', 'Visitor Auto Checked-In Successfully');
+        return redirect()->to(base_url('appointment/view/' . $id));
     }
 }
