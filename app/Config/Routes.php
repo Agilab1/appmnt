@@ -139,6 +139,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('checkin/(:num)', 'SecurityController::checkin/$1');
         $routes->get('checkout/(:num)', 'SecurityController::checkout/$1');
         $routes->get('scan', 'SecurityController::scan');
+        
         $routes->get('qrcheckin/(:num)', 'SecurityController::qrcheckin/$1');
     });
     // | DEV
