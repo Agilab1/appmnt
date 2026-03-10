@@ -101,10 +101,10 @@ $routes->get('appointment/success', 'Appointment::success');
 // | PROTECTED ROUTES
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
-   
+
     // | APPOINTMENT ROUTES (Protected)
-    
-    $routes->group('appointment', function ($routes){
+
+    $routes->group('appointment', function ($routes) {
         $routes->get('view/(:num)', 'Appointment::view/$1');
         $routes->get('edit/(:num)', 'Appointment::edit/$1');
         $routes->post('update/(:num)', 'Appointment::update/$1');
@@ -131,13 +131,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('appointments', 'AdminAppointments::index');
         $routes->get('appointment/approve/(:num)', 'AdminDashboard::approve/$1');
         $routes->get('appointment/reject/(:num)', 'AdminDashboard::reject/$1');
-    }); 
+    });
     // | SECURITY ROUTES
     $routes->group('security', function ($routes) {
         $routes->get('/', 'SecurityController::index');
         $routes->get('dashboard', 'SecurityController::index');
         $routes->get('checkin/(:num)', 'SecurityController::checkin/$1');
         $routes->get('checkout/(:num)', 'SecurityController::checkout/$1');
+        $routes->get('scan', 'SecurityController::scan');
+        $routes->get('qrcheckin/(:num)', 'SecurityController::qrcheckin/$1');
     });
     // | DEV
     $routes->get('gen-pass', function () {

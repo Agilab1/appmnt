@@ -48,6 +48,9 @@
 
 
     <!-- VISITOR TABLE -->
+    <a href="<?= base_url('security/scan') ?>" class="btn btn-primary">
+        Scan QR
+    </a>
     <h4 class="mb-3">Visitor Check-In</h4>
 
     <div class="card">

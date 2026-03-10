@@ -363,7 +363,6 @@ class StaffController extends BaseController
     }
     private function sendStatusEmail($appointment, $status)
     {
-
         $userEmail = $appointment->email;
         $emailService = \Config\Services::email();
         $emailService->clear();
@@ -378,75 +377,101 @@ class StaffController extends BaseController
         $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
         $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
 
-
-
         $emailService->setTo($userEmail);
 
         if ($status == 'Approved') {
 
+            $qrUrl = base_url('security/qrcheckin/' . $appointment->id);
+            $qrImageUrl = "https://quickchart.io/qr?size=250&text=" . urlencode($qrUrl);
+
+            $qrFilePath = FCPATH . 'uploads/qrcodes/qr_' . $appointment->id . '.png';
+
+            if (!file_exists(dirname($qrFilePath))) {
+                mkdir(dirname($qrFilePath), 0777, true);
+            }
+
+            file_put_contents($qrFilePath, file_get_contents($qrImageUrl));
+
+            $emailService->attach($qrFilePath, 'inline');
+            $cid = $emailService->setAttachmentCID($qrFilePath);
+
             $emailService->setSubject('Appointment Approved - AgiLabPlus');
 
             $message = "
-                 <h3>Dear {$appointment->name},</h3>
-                 <p>Your appointment has been
-                     <strong>Approved</strong>.
-                 </p>
-                 <p>
-                     <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
-                     <strong>Date:</strong> {$appointmentDate}<br>
-                     <strong>Time:</strong> {$appointmentTime}<br>
-                     <strong>Location:</strong> AgiLabPlus InvenTech, Pune Office<br>
-                     <strong>Person to Meet:</strong> {$staffName}
-                 </p>
-                 <h4>Important Instructions:</h4>
-                 <ul>
-                     <li>Please arrive at least <strong>10 minutes early</strong>.</li>
-                     <li>Kindly carry a valid <strong>ID proof</strong>.</li>
-                     <li>For any assistance, contact us at the number below.</li>
-                 </ul>
-                 <p>
-                     <strong>Contact Information:</strong><br>
-                     Email: sales@aiopcpl.in<br>
-                     Phone: +91 8766941359
-                 </p>
-                 <br>
-                 <p>
-                     Regards,<br>
-                     <strong>AgiLabPlus InvenTech</strong><br>
-                     Office Club Bavdhan, Pune, Maharashtra - 411071<br>
-                     Website: www.aiopcpl.in
-                 </p>
-             ";
+        <h3>Dear {$appointment->name},</h3>
+        <p>Your appointment has been <strong>Approved</strong>.</p>
+
+        <p>
+            <strong>Appointment ID:</strong> {$appointment->visitor_id}<br>
+            <strong>Date:</strong> {$appointmentDate}<br>
+            <strong>Time:</strong> {$appointmentTime}<br>
+            <strong>Person to Meet:</strong> {$staffName}
+        </p>
+
+        <h4>Your Entry QR Code</h4>
+        <p>Please show this QR Code at the security gate:</p>
+
+        <p style='text-align:center;'>
+            <img src='cid:$cid' alt='QR Code'>
+        </p>
+
+        <br>
+        <p>Regards,<br><strong>AgiLabPlus InvenTech</strong></p>
+    ";
         } else {
 
             $emailService->setSubject('Appointment Rejected - AgiLabPlus');
 
             $message = "
             <h3>Dear {$appointment->name},</h3>
+            <p>Your appointment has been <strong>Rejected</strong>.</p>
+
             <p>
-                Your appointment has been <strong>Rejected</strong>.
+                <strong>Appointment ID:</strong> {$appointment->visitor_id}
             </p>
-            <p>
-                 <strong>Appointment ID:</strong> {$appointment->visitor_id}
-            </p>
-            <p>
-                <strong>Status:</strong> Rejected
-            </p>
-            <p>
-                You may book again if required.
-            </p>
+
+            <p>You may book again if required.</p>
+
             <br>
-            <p>Thank You,<br>
-                AgiLabPlus InvenTech
-            </p>
-            ";
+            <p>Thank You,<br>AgiLabPlus InvenTech</p>
+        ";
         }
 
         $emailService->setMessage($message);
+
         if (!$emailService->send()) {
             log_message('error', $emailService->printDebugger(['headers']));
         }
     }
+
+    public function qrcheckin($id)
+    {
+        $model = new \App\Models\AppointmentModel();
+        $appointment = $model->find($id);
+
+        if (!$appointment) {
+            return "Invalid QR Code";
+        }
+
+        // Expiry check
+        if (strtotime($appointment->appointment_datetime) < time()) {
+            return "QR Code Expired";
+        }
+
+        // Already entered check
+        if ($appointment->entry_status == 'Entered') {
+            return "Visitor already checked-in";
+        }
+
+        // Update entry
+        $model->update($id, [
+            'entry_status' => 'Entered',
+            'entry_time'   => date('Y-m-d H:i:s')
+        ]);
+
+        return view('security/qr_success', ['appointment' => $appointment]);
+    }
+
     public function save()
     {
         if (session()->get('role') !== 'admin') {
