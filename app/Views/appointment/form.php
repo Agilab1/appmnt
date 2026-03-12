@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Book Appointment</title>
@@ -23,6 +24,7 @@
         }
     </style>
 </head>
+
 <body class="bg-light d-flex align-items-center min-vh-100">
     <?php
     $mode = $mode ?? 'create';
@@ -170,36 +172,61 @@
                                     <?= $isView ? 'readonly' : '' ?>
                                     required><?= $appointment->purpose ?? '' ?></textarea>
                             </div>
+
+                            <!-- </form> -->
                             <?php if (!$isView): ?>
                                 <button class="btn btn-primary btn-lg w-100">
                                     <?= $isEdit ? 'Update Appointment' : 'Submit Appointment' ?>
                                 </button>
                             <?php endif; ?>
+
+                            <?php if (
+                                $isEdit &&
+                                $appointment->status === 'Pending' &&
+                                session()->get('isLoggedIn') &&
+                                in_array(session()->get('role'), ['staff', 'admin'])
+                            ): ?>
+
+                                <div class="d-flex gap-2 mt-3">
+
+                                    <?php if (session()->get('role') === 'staff'): ?>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('staff/appointment/approve/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-success w-50">
+                                            Approve
+                                        </button>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('staff/appointment/reject/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-danger w-50">
+                                            Reject
+                                        </button>
+
+                                    <?php elseif (session()->get('role') === 'admin'): ?>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('admin/appointment/approve/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-success w-50">
+                                            Approve
+                                        </button>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('admin/appointment/reject/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-danger w-50">
+                                            Reject
+                                        </button>
+
+                                    <?php endif; ?>
+
+                                </div>
+
+                            <?php endif; ?>
                         </form>
-                        <?php if (
-                            $isEdit
-                            && session()->get('isLoggedIn')
-                            && in_array(session()->get('role'), ['staff', 'admin'])
-                            && $appointment->status === 'Pending'
-                        ): ?>
-                            <div class="d-flex gap-2 mt-3">
-                                <?php if (session()->get('role') === 'staff'): ?>
-                                    <a href="<?= base_url('staff/appointment/approve/' . $appointment->id) ?>" onclick="return confirm('Approve this appointment?')" class="btn btn-success w-50">
-                                        Approve
-                                    </a>
-                                    <a href="<?= base_url('staff/appointment/reject/' . $appointment->id) ?>" onclick="return confirm('Reject this appointment?')" class="btn btn-danger w-50">
-                                        Reject
-                                    </a>
-                                <?php elseif (session()->get('role') === 'admin'): ?>
-                                    <a href="<?= base_url('admin/appointment/approve/' . $appointment->id) ?>" onclick="return confirm('Approve this appointment?')" class="btn btn-success w-50">
-                                        Approve
-                                    </a>
-                                    <a href="<?= base_url('admin/appointment/reject/' . $appointment->id) ?>" onclick="return confirm('Reject this appointment?')" class="btn btn-danger w-50">
-                                        Reject
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -220,4 +247,5 @@
         </script>
     <?php endif; ?>
 </body>
+
 </html>

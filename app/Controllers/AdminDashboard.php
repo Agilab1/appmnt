@@ -120,45 +120,47 @@ class AdminDashboard extends BaseController
     // }
 
     public function approve($id)
-{
-    // 🔒 LOGIN + ROLE CHECK
-    if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
-        return redirect()->to('/login');
-    }
+    {
+        // 🔒 LOGIN + ROLE CHECK
+        if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
+            return redirect()->to('/login');
+        }
 
-    $model = new \App\Models\AppointmentModel();
-    $appointment = $model->find($id);
+        $model = new \App\Models\AppointmentModel();
+        $appointment = $model->find($id);
 
-    if (!$appointment) {
-        return redirect()->back()->with('error', 'Appointment not found');
-    }
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
 
-    // 🔒 Status check
-    if ($appointment->status !== 'Pending') {
-        return redirect()->back()->with('error', 'Invalid action');
-    }
+        // 🔒 Status check
+        if ($appointment->status !== 'Pending') {
+            return redirect()->back()->with('error', 'Invalid action');
+        }
 
-    // Update status
-    $model->update($id, ['status' => 'Approved']);
+        // Update status
+        $model->update($id, ['status' => 'Approved']);
 
-    // Fetch staff name
-    $staffModel = new \App\Models\StaffModel();
-    $staff = $staffModel->where('emp_code', $appointment->emp_code)->first();
+        // 🔥 updated appointment fetch again
+        $appointment = $model->find($id);
 
-    $staffName = $staff
-        ? $staff->first_nm . ' ' . $staff->last_nm
-        : 'Our Team Member';
+        // Fetch staff name
+        $staffModel = new \App\Models\StaffModel();
+        $staff = $staffModel->where('emp_code', $appointment->emp_code)->first();
+        $staffName = $staff
+            ? $staff->first_nm . ' ' . $staff->last_nm
+            : 'Our Team Member';
 
-    $emailService = \Config\Services::email();
-    $emailService->clear();
+        $emailService = \Config\Services::email();
+        $emailService->clear();
 
-    $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
-    $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
+        $appointmentDate = date('d M Y', strtotime($appointment->appointment_datetime));
+        $appointmentTime = date('h:i A', strtotime($appointment->appointment_datetime));
 
-    $emailService->setTo($appointment->email);
-    $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
+        $emailService->setTo($appointment->email);
+        $emailService->setSubject("Appointment Approved | AgiLabPlus InvenTech");
 
-     $message = "
+        $message = "
              <h3>Dear {$appointment->name},</h3>
 
              <p>Your appointment has been 
@@ -201,16 +203,16 @@ class AdminDashboard extends BaseController
              </p>
          ";
 
-    $emailService->setMessage($message);
+        $emailService->setMessage($message);
 
-    if (!$emailService->send()) {
+        if (!$emailService->send()) {
+            return redirect()->back()
+                ->with('error', 'Status updated but email failed');
+        }
+
         return redirect()->back()
-            ->with('error', 'Status updated but email failed');
+            ->with('success', 'Appointment approved and email sent successfully');
     }
-
-    return redirect()->back()
-        ->with('success', 'Appointment approved and email sent successfully');
-}
     // public function reject($id)
     // {
     //     $model = new \App\Models\AppointmentModel();
@@ -260,34 +262,34 @@ class AdminDashboard extends BaseController
     //         ->with('success', 'Appointment rejected and email sent successfully');
     // }
 
-   public function reject($id)
-{
-    if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
-        return redirect()->to('/login');
-    }
+    public function reject($id)
+    {
+        if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
+            return redirect()->to('/login');
+        }
 
-    $model = new \App\Models\AppointmentModel();
-    $appointment = $model->find($id);
+        $model = new \App\Models\AppointmentModel();
+        $appointment = $model->find($id);
 
-    if (!$appointment) {
-        return redirect()->back()->with('error', 'Appointment not found');
-    }
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
 
-    if ($appointment->status !== 'Pending') {
-        return redirect()->back()->with('error', 'Invalid action');
-    }
+        if ($appointment->status !== 'Pending') {
+            return redirect()->back()->with('error', 'Invalid action');
+        }
 
-    // update status
-    $model->update($id, ['status' => 'Rejected']);
+        // update status
+        $model->update($id, ['status' => 'Rejected']);
 
-    // Email service
-    $emailService = \Config\Services::email();
-    $emailService->clear();
+        // Email service
+        $emailService = \Config\Services::email();
+        $emailService->clear();
 
-    $emailService->setTo($appointment->email);
-    $emailService->setSubject("Appointment Rejected | AgiLabPlus InvenTech");
+        $emailService->setTo($appointment->email);
+        $emailService->setSubject("Appointment Rejected | AgiLabPlus InvenTech");
 
-    $message = "
+        $message = "
         <h3>Dear {$appointment->name},</h3>
 
         <p>Your appointment has been 
@@ -308,13 +310,13 @@ class AdminDashboard extends BaseController
         </p>
     ";
 
-    $emailService->setMessage($message);
+        $emailService->setMessage($message);
 
-    if (!$emailService->send()) {
-        return redirect()->back()->with('error', 'Status updated but email failed');
+        if (!$emailService->send()) {
+            return redirect()->back()->with('error', 'Status updated but email failed');
+        }
+
+        return redirect()->back()
+            ->with('success', 'Appointment rejected and email sent successfully');
     }
-
-    return redirect()->back()
-        ->with('success', 'Appointment rejected and email sent successfully');
-}
 }

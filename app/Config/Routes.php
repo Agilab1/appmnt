@@ -122,8 +122,12 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('edit/(:any)', 'StaffController::edit/$1', ['filter' => 'admin']);
         $routes->post('update/(:any)', 'StaffController::update/$1', ['filter' => 'admin']);
         $routes->get('delete/(:any)', 'StaffController::delete/$1', ['filter' => 'admin']);
-        $routes->get('appointment/approve/(:num)', 'StaffController::approve/$1');
-        $routes->get('appointment/reject/(:num)', 'StaffController::reject/$1');
+        // // $routes->get('appointment/approve/(:num)', 'StaffController::approve/$1');
+        // $routes->post('appointment/approve/(:num)', 'StaffController::approve/$1');
+        // // $routes->get('appointment/reject/(:num)', 'StaffController::reject/$1');
+        // $routes->post('appointment/reject/(:num)', 'StaffController::reject/$1');
+        $routes->match(['get', 'post'], 'appointment/approve/(:num)', 'StaffController::approve/$1');
+        $routes->match(['get', 'post'], 'appointment/reject/(:num)', 'StaffController::reject/$1');
     });
     // | ADMIN ROUTES
     $routes->group('admin', function ($routes) {

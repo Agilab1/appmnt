@@ -101,14 +101,16 @@ class Appointment extends BaseController
         );
         //  Overlap Protection (Same)
         $overlap = $model
-            ->where("(
+        ->where('emp_code', $this->request->getPost('emp_code'))
+        ->where('status !=', 'Rejected')
+        ->where("(
             ('$datetime' BETWEEN appointment_datetime AND end_datetime)
             OR
             ('$endDateTime' BETWEEN appointment_datetime AND end_datetime)
             OR
             (appointment_datetime BETWEEN '$datetime' AND '$endDateTime')
-        )")
-            ->countAllResults();
+            )")
+        ->countAllResults();
         if ($overlap > 0) {
             return redirect()->back()
                 ->withInput()
@@ -170,7 +172,7 @@ class Appointment extends BaseController
             ";
         $emailService->setMessage($message);
         if (!$emailService->send()) {
-            log_message('error', $emailService->printDebugger(['headers']));
+            log_message('error', $emailService->printDebugger());
         }
         $staffModel = new \App\Models\StaffModel();
         $staff = $staffModel
@@ -285,14 +287,19 @@ class Appointment extends BaseController
             return redirect()->back()->with('error', 'Appointment not found');
         }
 
+        $mode = 'view';
+
+        if (session()->get('isLoggedIn') && in_array(session()->get('role'), ['staff', 'admin'])) {
+            $mode = 'edit';
+        }
+
         $data['appointment'] = $appointment;
         $data['admin_id'] = $appointment->admin_id;
         $data['staffs'] = $staffModel->where('status', 1)->findAll();
-        $data['mode'] = 'edit';
+        $data['mode'] = $mode;
 
         return view('appointment/form', $data);
     }
-
     public function update($id)
     {
         $model = new AppointmentModel();
