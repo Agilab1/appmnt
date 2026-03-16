@@ -98,7 +98,7 @@ class StaffController extends BaseController
         $empCode = session()->get('emp_code');
         $appointmentModel = new AppointmentModel();
 
-        // COUNT CARDS
+        // COUNT CARDS (UNCHANGED)
         $total = $appointmentModel->where('emp_code', $empCode)->countAllResults();
 
         $pending = $appointmentModel->where([
@@ -116,21 +116,56 @@ class StaffController extends BaseController
             'status'   => 'Rejected'
         ])->countAllResults();
 
-        // APPOINTMENTS
-        $appointments = $appointmentModel
-            ->where('emp_code', $empCode)
-            ->orderBy('appointment_datetime', 'DESC')
-            ->findAll();
+        /*
+    ==================================================
+    ✅ DATE FILTER LOGIC (NEW — SAFE ADDITION)
+    ==================================================
+    */
+        $from = $this->request->getGet('from');
+        $to   = $this->request->getGet('to');
+
+        if ($from && $to) {
+
+            $appointments = $appointmentModel
+                ->where('emp_code', $empCode)
+                ->where("DATE(appointment_datetime) >=", $from)
+                ->where("DATE(appointment_datetime) <=", $to)
+                ->orderBy('appointment_datetime', 'DESC')
+                ->findAll();
+
+            // Filter counts
+            $f_total = count($appointments);
+            $f_pending = 0;
+            $f_approved = 0;
+            $f_rejected = 0;
+
+            foreach ($appointments as $row) {
+                if ($row->status == 'Pending') $f_pending++;
+                elseif ($row->status == 'Approved') $f_approved++;
+                else $f_rejected++;
+            }
+
+            $data['filtered']   = true;
+            $data['f_total']    = $f_total;
+            $data['f_pending']  = $f_pending;
+            $data['f_approved'] = $f_approved;
+            $data['f_rejected'] = $f_rejected;
+        } else {
+            // DEFAULT LIST (UNCHANGED)
+            $appointments = $appointmentModel
+                ->where('emp_code', $empCode)
+                ->orderBy('appointment_datetime', 'DESC')
+                ->findAll();
+        }
 
         /*
-        ==================================================
-        🔥 FULLCALENDAR FIX (IMPORTANT)
-        ==================================================
-        */
+    ==================================================
+    🔥 FULLCALENDAR EVENTS (UNCHANGED)
+    ==================================================
+    */
         $events = [];
 
         foreach ($appointments as $row) {
-
             $events[] = [
                 'id'    => $row->id,
                 'title' => $row->name,
@@ -141,17 +176,18 @@ class StaffController extends BaseController
                     'status' => $row->status,
                     'time' => date('h:i A', strtotime($row->appointment_datetime))
                 ],
-                'backgroundColor' => $row->status == 'Approved' ? '#28a745' : ($row->status == 'Pending' ? '#ffc107' : '#dc3545')
+                'backgroundColor' => $row->status == 'Approved'
+                    ? '#28a745'
+                    : ($row->status == 'Pending' ? '#ffc107' : '#dc3545')
             ];
         }
-        $data = [
-            'total'          => $total,
-            'pending'        => $pending,
-            'approved'       => $approved,
-            'rejected'       => $rejected,
-            'appointments'   => $appointments,
-            'calendarEvents' => json_encode($events)
-        ];
+
+        $data['total']          = $total;
+        $data['pending']        = $pending;
+        $data['approved']       = $approved;
+        $data['rejected']       = $rejected;
+        $data['appointments']   = $appointments;
+        $data['calendarEvents'] = json_encode($events);
 
         return view('staff/dashboard', $data);
     }

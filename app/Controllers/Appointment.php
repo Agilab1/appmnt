@@ -221,7 +221,7 @@ class Appointment extends BaseController
                             <a href='{$dashboardLink}' style='background-color:#0d6efd; color:white; padding:12px 25px; text-decoration:none; border-radius:6px; font-weight:bold;'> View Appointment </a>
                         </div>
                         <p style='margin-top:30px;font-size:13px;color:#666;'>
-                            This is an automated notification from 
+                            This is an automated notification from
                             <strong>AgiLabPlus InvenTech</strong>.
                         </p>
                     </div>
@@ -332,4 +332,58 @@ class Appointment extends BaseController
         return redirect()->to(base_url('appointment/view/' . $id))
             ->with('success', 'Appointment updated successfully');
     }
+
+    public function bookedDates()
+    {
+        $model = new \App\Models\AppointmentModel();
+
+        $dates = $model
+            ->select("DATE(appointment_datetime) as d")
+            ->where('status !=', 'Rejected')
+            ->groupBy("DATE(appointment_datetime)")
+            ->findAll();
+
+        $booked = [];
+
+        foreach ($dates as $row) {
+            $booked[] = $row->d;
+        }
+
+        return $this->response->setJSON($booked);
+    }
+    public function availableSlots()
+{
+    $date = $this->request->getPost('date');
+    $empCode = $this->request->getPost('emp_code');
+
+    $model = new \App\Models\AppointmentModel();
+
+    // Working hours
+    $start = strtotime($date . ' 09:00:00');
+    $end   = strtotime($date . ' 18:00:00');
+
+    // 30 min slots generate
+    $slots = [];
+    while ($start < $end) {
+        $slots[] = date('H:i', $start);
+        $start = strtotime('+30 minutes', $start);
+    }
+
+    // Booked slots
+    $appointments = $model
+        ->where('emp_code', $empCode)
+        ->where('DATE(appointment_datetime)', $date)
+        ->where('status !=', 'Rejected')
+        ->findAll();
+
+    $booked = [];
+    foreach ($appointments as $row) {
+        $booked[] = date('H:i', strtotime($row->appointment_datetime));
+    }
+
+    return $this->response->setJSON([
+        'slots' => $slots,
+        'booked' => $booked
+    ]);
+}
 }

@@ -92,6 +92,8 @@ $routes->get('admin/logout', 'StaffController::logout');
 $routes->get('appointment/form/(:num)', 'Appointment::form/$1');
 $routes->post('appointment/submit', 'Appointment::submit');
 $routes->get('appointment/success', 'Appointment::success');
+$routes->get('appointment/booked-dates', 'Appointment::bookedDates');
+$routes->post('appointment/available-slots', 'Appointment::availableSlots');
 
 // |appoiment QR
 // $routes->get('appointment/qr/(:num)', 'Appointment::generateQR/$1');
