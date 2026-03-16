@@ -228,6 +228,10 @@
 
                             </div>
 
+<<<<<<< HEAD
+=======
+                            <!-- </form> -->
+>>>>>>> bdbc4da6ef69054068ea2d0e7e74229fe626c7d7
                             <?php if (!$isView): ?>
 
                                 <button class="btn btn-primary btn-lg w-100">
@@ -238,8 +242,58 @@
 
                             <?php endif; ?>
 
+<<<<<<< HEAD
                         </form>
 
+=======
+                            <?php if (
+                                $isEdit &&
+                                $appointment->status === 'Pending' &&
+                                session()->get('isLoggedIn') &&
+                                in_array(session()->get('role'), ['staff', 'admin'])
+                            ): ?>
+
+                                <div class="d-flex gap-2 mt-3">
+
+                                    <?php if (session()->get('role') === 'staff'): ?>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('staff/appointment/approve/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-success w-50">
+                                            Approve
+                                        </button>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('staff/appointment/reject/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-danger w-50">
+                                            Reject
+                                        </button>
+
+                                    <?php elseif (session()->get('role') === 'admin'): ?>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('admin/appointment/approve/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-success w-50">
+                                            Approve
+                                        </button>
+
+                                        <button type="submit"
+                                            formaction="<?= base_url('admin/appointment/reject/' . $appointment->id) ?>"
+                                            formmethod="post"
+                                            class="btn btn-danger w-50">
+                                            Reject
+                                        </button>
+
+                                    <?php endif; ?>
+
+                                </div>
+
+                            <?php endif; ?>
+                        </form>
+>>>>>>> bdbc4da6ef69054068ea2d0e7e74229fe626c7d7
                     </div>
                 </div>
             </div>

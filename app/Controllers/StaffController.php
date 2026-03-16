@@ -278,7 +278,7 @@ class StaffController extends BaseController
     // }
     public function approve($id)
     {
-        // 🔒 LOGIN + ROLE CHECK
+        //  LOGIN + ROLE CHECK
         if (!session()->get('isLoggedIn') || session()->get('role') !== 'staff') {
             return redirect()->to('/login');
         }
@@ -290,20 +290,50 @@ class StaffController extends BaseController
             return redirect()->back()->with('error', 'Appointment not found');
         }
 
-        // 🔒 Staff ownership check
+        //  Staff ownership check
         if ($appointment->emp_code !== session()->get('emp_code')) {
             return redirect()->back()->with('error', 'Unauthorized access');
         }
 
-        // 🔒 Status check
+        //  Status check
         if ($appointment->status !== 'Pending') {
             return redirect()->back()->with('error', 'Invalid action');
         }
 
-        // ✅ Update status
-        $model->update($id, ['status' => 'Approved']);
+        //  Update status
+        $date = $this->request->getPost('appointment_date');
+        $time = $this->request->getPost('appointment_time');
 
-        // 📧 Send Email
+        if (!$date || !$time) {
+            $date = date('Y-m-d', strtotime($appointment->appointment_datetime));
+            $time = date('H:i', strtotime($appointment->appointment_datetime));
+        }
+
+        $durationHour   = $this->request->getPost('duration_hour');
+        $durationMinute = $this->request->getPost('duration_minute');
+
+        $datetime = date('Y-m-d H:i:s', strtotime("$date $time"));
+
+        $totalMinutes = ((int)$durationHour * 60) + (int)$durationMinute;
+
+        $endDateTime = date(
+            'Y-m-d H:i:s',
+            strtotime($datetime . " +$totalMinutes minutes")
+        );
+
+        $model->update($id, [
+            'appointment_datetime' => $datetime,
+            'end_datetime' => $endDateTime,
+            'duration_hour' => $durationHour,
+            'duration_minute' => $durationMinute,
+            'purpose' => $this->request->getPost('purpose'),
+            'status' => 'Approved'
+        ]);
+
+        //  Fetch updated appointment
+        $appointment = $model->find($id);
+
+        //  Send Email
         $this->sendStatusEmail($appointment, 'Approved');
 
         return redirect()->back()
