@@ -227,11 +227,7 @@
                                     required><?= $appointment->purpose ?? '' ?></textarea>
 
                             </div>
-
-<<<<<<< HEAD
-=======
                             <!-- </form> -->
->>>>>>> bdbc4da6ef69054068ea2d0e7e74229fe626c7d7
                             <?php if (!$isView): ?>
 
                                 <button class="btn btn-primary btn-lg w-100">
@@ -242,10 +238,7 @@
 
                             <?php endif; ?>
 
-<<<<<<< HEAD
                         </form>
-
-=======
                             <?php if (
                                 $isEdit &&
                                 $appointment->status === 'Pending' &&
@@ -293,7 +286,6 @@
 
                             <?php endif; ?>
                         </form>
->>>>>>> bdbc4da6ef69054068ea2d0e7e74229fe626c7d7
                     </div>
                 </div>
             </div>
