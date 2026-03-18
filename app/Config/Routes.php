@@ -135,8 +135,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->group('admin', function ($routes) {
         $routes->get('dashboard', 'AdminDashboard::index');
         $routes->get('appointments', 'AdminAppointments::index');
-        $routes->get('appointment/approve/(:num)', 'AdminDashboard::approve/$1');
-        $routes->get('appointment/reject/(:num)', 'AdminDashboard::reject/$1');
+        // $routes->get('appointment/approve/(:num)', 'AdminDashboard::approve/$1');
+        // $routes->get('appointment/reject/(:num)', 'AdminDashboard::reject/$1');
+        $routes->match(['get', 'post'], 'appointment/approve/(:num)', 'AdminDashboard::approve/$1');
+        $routes->match(['get', 'post'], 'appointment/reject/(:num)', 'AdminDashboard::reject/$1');
     });
     // | SECURITY ROUTES
     $routes->group('security', function ($routes) {

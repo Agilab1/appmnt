@@ -177,6 +177,7 @@
                                     id="appointment_time"
                                     name="appointment_time"
                                     class="form-control form-control-lg"
+                                    value="<?= isset($appointment->appointment_datetime) ? date('H:i', strtotime($appointment->appointment_datetime)) : '' ?>"
                                     readonly
                                     required>
 
@@ -238,7 +239,7 @@
 
                             <?php endif; ?>
 
-                        </form>
+                        
                             <?php if (
                                 $isEdit &&
                                 $appointment->status === 'Pending' &&
