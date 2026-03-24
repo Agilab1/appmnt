@@ -61,6 +61,11 @@
                     </div>
 
                     <div class="card-body p-4">
+                        <!-- <?php
+                        // echo "ROLE = " . session()->get('role');
+                        ?> -->
+
+
 
                         <?php if (session()->getFlashdata('success')): ?>
                             <div class="alert alert-success">
@@ -239,7 +244,7 @@
 
                             <?php endif; ?>
 
-                        
+
                             <?php if (
                                 $isEdit &&
                                 $appointment->status === 'Pending' &&
@@ -280,6 +285,39 @@
                                             class="btn btn-danger w-50">
                                             Reject
                                         </button>
+
+                                    <?php endif; ?>
+
+                                </div>
+
+                            <?php endif; ?>
+
+                            <!-- < -->
+                            <!-- ?php if ( -->
+                            <!-- // $isView && -->
+                            <!-- // session()->get('isLoggedIn') && -->
+                            <!-- // session()->get('role') === 'security' -->
+                            <!-- // in_array(session()->get('role'), ['security']) -->
+                            <!-- ): -->
+                            <!-- ?> -->
+                            <?php if (session()->get('role') === 'security' && $appointment): ?>
+
+                                <div class="mt-3 d-flex gap-2">
+
+                                   
+                                        <?php if ($appointment->entry_status === 'Waiting' || empty($appointment->entry_status)): ?>
+
+                                        <a href="<?= base_url('security/checkin/' . $appointment->id) ?>"
+                                            class="btn btn-success w-50">
+                                            Check-In
+                                        </a>
+
+                                    <?php elseif ($appointment->entry_status === 'Entered'): ?>
+
+                                        <a href="<?= base_url('security/checkout/' . $appointment->id) ?>"
+                                            class="btn btn-danger w-50">
+                                            Check-Out
+                                        </a>
 
                                     <?php endif; ?>
 

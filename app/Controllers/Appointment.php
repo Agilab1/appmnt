@@ -101,16 +101,16 @@ class Appointment extends BaseController
         );
         //  Overlap Protection (Same)
         $overlap = $model
-        ->where('emp_code', $this->request->getPost('emp_code'))
-        ->where('status !=', 'Rejected')
-        ->where("(
+            ->where('emp_code', $this->request->getPost('emp_code'))
+            ->where('status !=', 'Rejected')
+            ->where("(
             ('$datetime' BETWEEN appointment_datetime AND end_datetime)
             OR
             ('$endDateTime' BETWEEN appointment_datetime AND end_datetime)
             OR
             (appointment_datetime BETWEEN '$datetime' AND '$endDateTime')
             )")
-        ->countAllResults();
+            ->countAllResults();
         if ($overlap > 0) {
             return redirect()->back()
                 ->withInput()
@@ -253,14 +253,68 @@ class Appointment extends BaseController
         return view('appointment/qr', ['qrCode' => $qrCode]);
     }
     public function view($id)
-    {
-        $model = new AppointmentModel();
-        $staffModel = new StaffModel();
+{
+    $model = new AppointmentModel();
+    $staffModel = new StaffModel();
 
-        $appointment = $model->find($id);
+    $appointment = $model->find($id);
 
-        if (!$appointment) {
-            return redirect()->back()->with('error', 'Appointment not found');
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found');
+    }
+
+    $sessionRole = session()->get('role');
+
+    // STAFF / ADMIN
+    if ($sessionRole === 'staff' || $sessionRole === 'admin') {
+
+        $data['appointment'] = $appointment;
+        $data['admin_id'] = $appointment->admin_id;
+        $data['staffs'] = $staffModel->where('status', 1)->findAll();
+        $data['mode'] = 'view';
+
+        return view('appointment/form', $data);
+    }
+
+    // VISITOR
+    if (!$sessionRole) {
+
+        $data['appointment'] = $appointment;
+        $data['admin_id'] = $appointment->admin_id;
+        $data['staffs'] = $staffModel->where('status', 1)->findAll();
+        $data['mode'] = 'view';
+
+        return view('appointment/form', $data);
+    }
+
+    // SECURITY
+    if ($sessionRole === 'security') {
+
+        $now = time();
+        $start = strtotime($appointment->appointment_datetime);
+
+        if (!empty($appointment->end_datetime)) {
+            $end = strtotime($appointment->end_datetime);
+        } else {
+            $end = strtotime("+1 hour", $start);
+        }
+
+        $allowedStart = strtotime("-30 minutes", $start);
+
+        if ($now < $allowedStart) {
+
+            return view('appointment/message', [
+                'msg' => 'You have arrived too early.',
+                'type' => 'early'
+            ]);
+        }
+
+        if ($now > $end) {
+
+            return view('appointment/message', [
+                'msg' => 'Appointment expired.',
+                'type' => 'expired'
+            ]);
         }
 
         $data['appointment'] = $appointment;
@@ -268,8 +322,9 @@ class Appointment extends BaseController
         $data['staffs'] = $staffModel->where('status', 1)->findAll();
         $data['mode'] = 'view';
 
-        return view('appointment/form', $data);   // ✅ CHANGE HERE
+        return view('appointment/form', $data);
     }
+}
     public function success()
     {
         return "Appointment request submitted successfully!";
@@ -359,38 +414,38 @@ class Appointment extends BaseController
         return $this->response->setJSON($booked);
     }
     public function availableSlots()
-{
-    $date = $this->request->getPost('date');
-    $empCode = $this->request->getPost('emp_code');
+    {
+        $date = $this->request->getPost('date');
+        $empCode = $this->request->getPost('emp_code');
 
-    $model = new \App\Models\AppointmentModel();
+        $model = new \App\Models\AppointmentModel();
 
-    // Working hours
-    $start = strtotime($date . ' 09:00:00');
-    $end   = strtotime($date . ' 18:00:00');
+        // Working hours
+        $start = strtotime($date . ' 09:00:00');
+        $end   = strtotime($date . ' 18:00:00');
 
-    // 30 min slots generate
-    $slots = [];
-    while ($start < $end) {
-        $slots[] = date('H:i', $start);
-        $start = strtotime('+30 minutes', $start);
+        // 30 min slots generate
+        $slots = [];
+        while ($start < $end) {
+            $slots[] = date('H:i', $start);
+            $start = strtotime('+30 minutes', $start);
+        }
+
+        // Booked slots
+        $appointments = $model
+            ->where('emp_code', $empCode)
+            ->where('DATE(appointment_datetime)', $date)
+            ->where('status !=', 'Rejected')
+            ->findAll();
+
+        $booked = [];
+        foreach ($appointments as $row) {
+            $booked[] = date('H:i', strtotime($row->appointment_datetime));
+        }
+
+        return $this->response->setJSON([
+            'slots' => $slots,
+            'booked' => $booked
+        ]);
     }
-
-    // Booked slots
-    $appointments = $model
-        ->where('emp_code', $empCode)
-        ->where('DATE(appointment_datetime)', $date)
-        ->where('status !=', 'Rejected')
-        ->findAll();
-
-    $booked = [];
-    foreach ($appointments as $row) {
-        $booked[] = date('H:i', strtotime($row->appointment_datetime));
-    }
-
-    return $this->response->setJSON([
-        'slots' => $slots,
-        'booked' => $booked
-    ]);
-}
 }

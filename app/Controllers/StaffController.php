@@ -572,7 +572,7 @@ class StaffController extends BaseController
                 'email_id' => $data['email_id'],
                 'username' => $data['emp_code'],
                 'pass_wd' => $data['pass_wd'],
-                'entry_status' => 0
+                // 'entry_status' => 0
             ]);
         }
 

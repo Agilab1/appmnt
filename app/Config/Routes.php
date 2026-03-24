@@ -101,13 +101,14 @@ $routes->post('appointment/available-slots', 'Appointment::availableSlots');
 // $routes->get('appointment/edit/(:num)', 'Appointment::edit/$1');
 // $routes->post('appointment/update/(:num)', 'Appointment::update/$1');
 // | PROTECTED ROUTES
+ $routes->get('appointment/view/(:num)', 'Appointment::view/$1');
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 
     // | APPOINTMENT ROUTES (Protected)
 
     $routes->group('appointment', function ($routes) {
-        $routes->get('view/(:num)', 'Appointment::view/$1');
+       
         $routes->get('edit/(:num)', 'Appointment::edit/$1');
         $routes->post('update/(:num)', 'Appointment::update/$1');
         // $routes->get('approve/(:num)', 'Appointment::approve/$1');

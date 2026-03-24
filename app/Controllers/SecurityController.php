@@ -45,7 +45,14 @@ class SecurityController extends BaseController
 
     public function checkin($id)
     {
-        (new AppointmentModel())->update($id, [
+        $model = new AppointmentModel();
+        $appointment = $model->find($id);
+
+        if ($appointment->entry_status == 'Entered') {
+            return redirect()->back()->with('error', 'Visitor already checked-in');
+        }
+
+        $model->update($id, [
             'entry_status' => 'Entered',
             'entry_time'   => date('Y-m-d H:i:s')
         ]);
@@ -54,9 +61,26 @@ class SecurityController extends BaseController
             ->with('success', 'Visitor Checked-In Successfully');
     }
 
+    // public function checkout($id)
+    // {
+    //     (new AppointmentModel())->update($id, [
+    //         'entry_status' => 'Exited',
+    //         'exit_time'    => date('Y-m-d H:i:s')
+    //     ]);
+
+    //     return redirect()->to('/security/dashboard')
+    //         ->with('success', 'Visitor Checked-Out Successfully');
+    // }
     public function checkout($id)
     {
-        (new AppointmentModel())->update($id, [
+        $model = new AppointmentModel();
+        $appointment = $model->find($id);
+
+        if ($appointment->entry_status != 'Entered') {
+            return redirect()->back()->with('error', 'Visitor not checked-in yet');
+        }
+
+        $model->update($id, [
             'entry_status' => 'Exited',
             'exit_time'    => date('Y-m-d H:i:s')
         ]);
@@ -83,6 +107,25 @@ class SecurityController extends BaseController
     }
     public function qrcheckin($id)
     {
+        //     $model = new \App\Models\AppointmentModel();
+        //     $appointment = $model->find($id);
+
+        //     if (!$appointment) {
+        //         return "Invalid QR Code";
+        //     }
+
+        //     // Already checked-in?
+        //     if ($appointment->entry_status == 'Entered') {
+        //         return "Visitor already checked-in";
+        //     }
+
+        //     // Mark as Entered
+        //     $model->update($id, [
+        //         'entry_status' => 'Entered',
+        //         'entry_time'   => date('Y-m-d H:i:s')
+        //     ]);
+
+        //     return redirect()->to(base_url('appointment/view/' . $id));
         $model = new \App\Models\AppointmentModel();
         $appointment = $model->find($id);
 
@@ -90,16 +133,8 @@ class SecurityController extends BaseController
             return "Invalid QR Code";
         }
 
-        // Already checked-in?
-        if ($appointment->entry_status == 'Entered') {
-            return "Visitor already checked-in";
-        }
-
-        // Mark as Entered
-        $model->update($id, [
-            'entry_status' => 'Entered',
-            'entry_time'   => date('Y-m-d H:i:s')
-        ]);
+        //  REMOVE auto check-in logic
+        //  ONLY redirect to view page
 
         return redirect()->to(base_url('appointment/view/' . $id));
     }
