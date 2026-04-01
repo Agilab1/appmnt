@@ -42,7 +42,8 @@
     <?php
     $mode = $mode ?? 'create';
     $isEdit = ($mode === 'edit');
-    $isView = ($mode === 'view');
+    // $isView = ($mode === 'view');
+    $isView = ($mode === 'view' || $mode === 'security_view');
     $appointment = $appointment ?? null;
     ?>
 
@@ -62,8 +63,8 @@
 
                     <div class="card-body p-4">
                         <!-- <?php
-                        // echo "ROLE = " . session()->get('role');
-                        ?> -->
+                                // echo "ROLE = " . session()->get('role');
+                                ?> -->
 
 
 
@@ -300,19 +301,18 @@
                             <!-- // in_array(session()->get('role'), ['security']) -->
                             <!-- ): -->
                             <!-- ?> -->
-                            <?php if (session()->get('role') === 'security' && $appointment): ?>
+                            <?php if (session()->get('role') === 'security' && $appointment && $mode !== 'security_view'): ?>
 
                                 <div class="mt-3 d-flex gap-2">
 
-                                   
-                                        <?php if ($appointment->entry_status === 'Waiting' || empty($appointment->entry_status)): ?>
+                                    <?php if ($appointment->entry_status === 'Waiting' || empty($appointment->entry_status)): ?>
 
                                         <a href="<?= base_url('security/checkin/' . $appointment->id) ?>"
                                             class="btn btn-success w-50">
                                             Check-In
                                         </a>
 
-                                    <?php elseif ($appointment->entry_status === 'Entered'): ?>
+                                    <?php elseif ($appointment->entry_status === 'Entered' && session()->get('qr_action') === 'checkout'): ?>
 
                                         <a href="<?= base_url('security/checkout/' . $appointment->id) ?>"
                                             class="btn btn-danger w-50">

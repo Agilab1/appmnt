@@ -43,6 +43,50 @@ class SecurityController extends BaseController
         return view('security/dashboard', $data);
     }
 
+    // public function checkin($id)
+    // {
+    //     // $model = new AppointmentModel();
+    //     // $appointment = $model->find($id);
+
+    //     // if ($appointment->entry_status == 'Entered') {
+    //     //     return redirect()->back()->with('error', 'Visitor already checked-in');
+    //     // }
+
+    //     // $model->update($id, [
+    //     //     'entry_status' => 'Entered',
+    //     //     'entry_time'   => date('Y-m-d H:i:s')
+    //     // ]);
+
+    //     // // remove qr session
+    //     // session()->remove('qr_scan');
+
+    //     // // return redirect()->to('/security/dashboard')
+    //     // return redirect()->to(base_url('appointment/view/' . $id))
+    //     //     ->with('success', 'Visitor Checked-In Successfully');
+    //     $model = new AppointmentModel();
+    //     $appointment = $model->find($id);
+    //     session()->remove(['qr_scan', 'qr_action']);
+    //     if ($appointment->entry_status == 'Entered') {
+    //         return redirect()->back()->with('error', 'Visitor already checked-in');
+    //     }
+
+    //     $model->update($id, [
+    //         'entry_status' => 'Entered',
+    //         'entry_time'   => date('Y-m-d H:i:s')
+    //     ]);
+
+    //     if (session()->get('qr_scan')) {
+
+    //         session()->set('qr_action', 'checkout');
+
+    //         return redirect()->to(base_url('appointment/view/' . $id))
+    //             ->with('success', 'Visitor Checked-In Successfully');
+    //     } else {
+
+    //         return redirect()->to(base_url('security/dashboard'))
+    //             ->with('success', 'Visitor Checked-In Successfully');
+    //     }
+    // }
     public function checkin($id)
     {
         $model = new AppointmentModel();
@@ -57,22 +101,40 @@ class SecurityController extends BaseController
             'entry_time'   => date('Y-m-d H:i:s')
         ]);
 
-        return redirect()->to('/security/dashboard')
-            ->with('success', 'Visitor Checked-In Successfully');
+        if (session()->get('qr_scan')) {
+
+            // remove session AFTER use
+            session()->remove(['qr_scan', 'qr_action']);
+
+            return redirect()->to(base_url('appointment/view/' . $id))
+                ->with('success', 'Visitor Checked-In Successfully');
+        } else {
+
+            return redirect()->to(base_url('security/dashboard'))
+                ->with('success', 'Visitor Checked-In Successfully');
+        }
     }
 
-    // public function checkout($id)
-    // {
-    //     (new AppointmentModel())->update($id, [
-    //         'entry_status' => 'Exited',
-    //         'exit_time'    => date('Y-m-d H:i:s')
-    //     ]);
 
-    //     return redirect()->to('/security/dashboard')
-    //         ->with('success', 'Visitor Checked-Out Successfully');
-    // }
     public function checkout($id)
     {
+        // $model = new AppointmentModel();
+        // $appointment = $model->find($id);
+
+        // if ($appointment->entry_status != 'Entered') {
+        //     return redirect()->back()->with('error', 'Visitor not checked-in yet');
+        // }
+
+        // $model->update($id, [
+        //     'entry_status' => 'Exited',
+        //     'exit_time'    => date('Y-m-d H:i:s')
+        // ]);
+
+        // // remove QR session
+        // session()->remove('qr_scan');
+        // // return redirect()->to('/security/dashboard')
+        // return redirect()->to(base_url('appointment/view/' . $id))
+        //     ->with('success', 'Visitor Checked-Out Successfully');
         $model = new AppointmentModel();
         $appointment = $model->find($id);
 
@@ -85,8 +147,17 @@ class SecurityController extends BaseController
             'exit_time'    => date('Y-m-d H:i:s')
         ]);
 
-        return redirect()->to('/security/dashboard')
-            ->with('success', 'Visitor Checked-Out Successfully');
+        if (session()->get('qr_scan')) {
+
+            session()->remove(['qr_scan', 'qr_action']);
+
+            return redirect()->to(base_url('appointment/view/' . $id))
+                ->with('success', 'Visitor Checked-Out Successfully');
+        } else {
+
+            return redirect()->to(base_url('security/dashboard'))
+                ->with('success', 'Visitor Checked-Out Successfully');
+        }
     }
     public function gatepass($id)
     {
@@ -132,10 +203,67 @@ class SecurityController extends BaseController
         if (!$appointment) {
             return "Invalid QR Code";
         }
+        // QR scan flag
+        if ($appointment->entry_status === 'Entered') {
 
+            session()->set([
+                'qr_scan' => true,
+                'qr_action' => 'checkout'
+            ]);
+        } else {
+
+            session()->set([
+                'qr_scan' => true,
+                'qr_action' => 'checkin'
+            ]);
+        }
         //  REMOVE auto check-in logic
         //  ONLY redirect to view page
 
         return redirect()->to(base_url('appointment/view/' . $id));
+    }
+    //     public function qrcheckin($id)
+    // {
+    //     $model = new \App\Models\AppointmentModel();
+    //     $appointment = $model->find($id);
+
+    //     if (!$appointment) {
+    //         return "Invalid QR Code";
+    //     }
+
+    //     // ❗ already checkout
+    //     if ($appointment->entry_status === 'Exited') {
+    //         return redirect()->back()->with('error','Visitor already checked-out');
+    //     }
+
+    //     // ❗ appointment not approved
+    //     if ($appointment->status !== 'Approved') {
+    //         return redirect()->back()->with('error','Appointment not approved');
+    //     }
+
+    //     session()->set([
+    //         'qr_scan' => true,
+    //         'qr_action' => 'checkin'
+    //     ]);
+
+    //     return redirect()->to(base_url('appointment/view/' . $id));
+    // }
+    public function view($id)
+    {
+        if (!session()->get('isLoggedIn') || session()->get('role') !== 'security') {
+            return redirect()->to('/login');
+        }
+        $model = new \App\Models\AppointmentModel();
+        $staffModel = new \App\Models\StaffModel();
+        $appointment = $model->find($id);
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment Not Found');
+        }
+        $data['appointment'] = $appointment;
+        $data['admin_id'] = $appointment->admin_id;
+        $data['staffs'] = $staffModel->where('status', 1)->findAll();
+
+        $data['mode'] = 'security_view';
+        return view('appointment/form', $data);
     }
 }

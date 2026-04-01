@@ -146,6 +146,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/', 'SecurityController::index');
         $routes->get('dashboard', 'SecurityController::index');
         $routes->get('checkin/(:num)', 'SecurityController::checkin/$1');
+        $routes->get('view/(:num)', 'SecurityController::view/$1');   // for security dashboard visitor id view
         $routes->get('checkout/(:num)', 'SecurityController::checkout/$1');
         $routes->get('scan', 'SecurityController::scan');
         $routes->get('qrcheckin/(:num)', 'SecurityController::qrcheckin/$1');

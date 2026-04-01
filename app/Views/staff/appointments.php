@@ -6,8 +6,8 @@
 
     <div class="card">
         <div class="card-body p-0">
-             <table id="dtbl" class="table table-striped table-bordered">
-            <!-- <table class="table table-bordered table-striped mb-0"> -->
+            <table id="dtbl" class="table table-striped table-bordered">
+                <!-- <table class="table table-bordered table-striped mb-0"> -->
                 <thead class="table-primary">
                     <tr>
                         <th>Name</th>
@@ -38,18 +38,18 @@
                                     <?php endif; ?>
                                 </td>
                                 <td>
-<?php if ($row['status'] == 'Pending') : ?>
+                                    <?php if ($row['status'] == 'Pending') : ?>
 
-<a href="<?= base_url('staff/appointment/approve/'.$row['id']) ?>"
-   class="btn btn-success btn-sm">Approve</a>
+                                        <a href="<?= base_url('staff/appointment/approve/' . $row['id']) ?>"
+                                            class="btn btn-success btn-sm">Approve</a>
 
-<a href="<?= base_url('staff/appointment/reject/'.$row['id']) ?>"
-   class="btn btn-danger btn-sm">Reject</a>
+                                        <a href="<?= base_url('staff/appointment/reject/' . $row['id']) ?>"
+                                            class="btn btn-danger btn-sm">Reject</a>
 
-<?php else: ?>
--
-<?php endif; ?>
-</td>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
 
                             </tr>
                         <?php endforeach; ?>
@@ -86,7 +86,7 @@
 
         $('#example2').DataTable({
             "paging": true,
-            "lengthChange": false,  
+            "lengthChange": false,
             "searching": false,
             "ordering": true,
             "info": true,
@@ -96,4 +96,3 @@
     });
 </script>
 <?= $this->endsection(); ?>
-

@@ -6,6 +6,17 @@
 <div class="container mt-4">
 
     <h3 class="mb-4">Security Dashboard</h3>
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success">
+            <?= session()->getFlashdata('success') ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger">
+            <?= session()->getFlashdata('error') ?>
+        </div>
+    <?php endif; ?>
 
     <!-- DASHBOARD CARDS -->
     <div class="row g-3 mb-4">
@@ -97,7 +108,8 @@
                     <?php foreach ($appointments as $row): ?>
                         <tr>
                             <td>
-                                <a href="<?= base_url('appointment/view/' . $row->id) ?>">
+                                <!-- <a href="<?= base_url('appointment/view/' . $row->id) ?>"> -->
+                                <a href="<?= base_url('security/view/' . $row->id) ?>">
                                     <?= esc($row->visitor_id) ?>
                                 </a>
                             </td>
@@ -145,84 +157,89 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-$(document).ready(function () {
+    $(document).ready(function() {
 
-    var table = $("#dtbl").DataTable({
-        responsive: true,
-        lengthChange: false,
-        autoWidth: false,
-        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
-    });
+        var table = $("#dtbl").DataTable({
+            responsive: true,
+            lengthChange: false,
+            autoWidth: false,
+            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        });
 
-    table.buttons().container().appendTo('#dtbl_wrapper .col-md-6:eq(0)');
+        table.buttons().container().appendTo('#dtbl_wrapper .col-md-6:eq(0)');
 
-    flatpickr("#filterDate", {
-        dateFormat: "Y-m-d",
-        defaultDate: "today"
-    });
+        flatpickr("#filterDate", {
+            dateFormat: "Y-m-d",
+            defaultDate: "today"
+        });
 
-    let today = new Date().toISOString().split('T')[0];
-    $('#filterDate').val(today);
+        let today = new Date().toISOString().split('T')[0];
+        $('#filterDate').val(today);
 
-    window.filterType = "all";
+        window.filterType = "all";
 
-    $.fn.dataTable.ext.search.push(function (settings, data) {
+        $.fn.dataTable.ext.search.push(function(settings, data) {
 
-        try {
-            let selectedDate = $('#filterDate').val();
-            let appointmentDate = data[3];
+            try {
+                let selectedDate = $('#filterDate').val();
+                let appointmentDate = data[3];
 
-            if (selectedDate && appointmentDate) {
-                let parts = appointmentDate.split(" ");
-                let formatted = parts[1] + " " + parts[0] + ", " + parts[2];
+                if (selectedDate && appointmentDate) {
+                    let parts = appointmentDate.split(" ");
+                    let formatted = parts[1] + " " + parts[0] + ", " + parts[2];
 
-                let rowDate = new Date(formatted);
-                let filterDate = new Date(selectedDate);
+                    let rowDate = new Date(formatted);
+                    let filterDate = new Date(selectedDate);
 
-                if (
-                    rowDate.getFullYear() !== filterDate.getFullYear() ||
-                    rowDate.getMonth() !== filterDate.getMonth() ||
-                    rowDate.getDate() !== filterDate.getDate()
-                ) {
-                    return false;
+                    if (
+                        rowDate.getFullYear() !== filterDate.getFullYear() ||
+                        rowDate.getMonth() !== filterDate.getMonth() ||
+                        rowDate.getDate() !== filterDate.getDate()
+                    ) {
+                        return false;
+                    }
                 }
+
+                let inTime = data[6];
+                let outTime = data[7];
+
+                if (window.filterType === 'checkin') {
+                    return (inTime && inTime !== "-") && (!outTime || outTime === "-");
+                }
+
+                if (window.filterType === 'checkout') {
+                    return outTime && outTime !== "-";
+                }
+
+                // ✅ NEW PENDING FILTER
+                if (window.filterType === 'pending') {
+                    return (!inTime || inTime === "-") && (!outTime || outTime === "-");
+                }
+
+                return true;
+
+            } catch (e) {
+                console.log(e);
+                return true;
             }
+        });
 
-            let inTime = data[6];
-            let outTime = data[7];
+        $(document).on('click', '.status-filter', function() {
+            window.filterType = $(this).data('type');
+            $('#statusBtn').text($(this).text());
+            table.draw();
+        });
 
-            if (window.filterType === 'checkin') {
-                return (inTime && inTime !== "-") && (!outTime || outTime === "-");
-            }
+        $('#filterDate').on('change', function() {
+            table.draw();
+        });
 
-            if (window.filterType === 'checkout') {
-                return outTime && outTime !== "-";
-            }
-
-            // ✅ NEW PENDING FILTER
-            if (window.filterType === 'pending') {
-                return (!inTime || inTime === "-") && (!outTime || outTime === "-");
-            }
-
-            return true;
-
-        } catch (e) {
-            console.log(e);
-            return true;
-        }
     });
-
-    $(document).on('click', '.status-filter', function () {
-        window.filterType = $(this).data('type');
-        $('#statusBtn').text($(this).text());
-        table.draw();
-    });
-
-    $('#filterDate').on('change', function () {
-        table.draw();
-    });
-
-});
+</script>
+<script>
+    setTimeout(function() {
+        $('.alert').fadeOut('slow');
+    }, 5000);
 </script>
 
 <?= $this->endSection() ?>
