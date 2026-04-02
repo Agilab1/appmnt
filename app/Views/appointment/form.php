@@ -305,8 +305,7 @@
 
                                 <div class="mt-3 d-flex gap-2">
 
-                                    <?php if ($appointment->entry_status === 'Waiting' || empty($appointment->entry_status)): ?>
-
+                                    <?php if (($appointment->entry_status === 'Waiting' || empty($appointment->entry_status)) && ($time_valid ?? true)): ?>
                                         <a href="<?= base_url('security/checkin/' . $appointment->id) ?>"
                                             class="btn btn-success w-50">
                                             Check-In

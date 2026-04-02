@@ -253,78 +253,115 @@ class Appointment extends BaseController
         return view('appointment/qr', ['qrCode' => $qrCode]);
     }
     public function view($id)
-{
-    $model = new AppointmentModel();
-    $staffModel = new StaffModel();
+    {
+        $model = new AppointmentModel();
+        $staffModel = new StaffModel();
 
-    $appointment = $model->find($id);
+        $appointment = $model->find($id);
 
-    if (!$appointment) {
-        return redirect()->back()->with('error', 'Appointment not found');
-    }
-
-    $sessionRole = session()->get('role');
-
-    // STAFF / ADMIN
-    if ($sessionRole === 'staff' || $sessionRole === 'admin') {
-
-        $data['appointment'] = $appointment;
-        $data['admin_id'] = $appointment->admin_id;
-        $data['staffs'] = $staffModel->where('status', 1)->findAll();
-        $data['mode'] = 'view';
-
-        return view('appointment/form', $data);
-    }
-
-    // VISITOR
-    if (!$sessionRole) {
-
-        $data['appointment'] = $appointment;
-        $data['admin_id'] = $appointment->admin_id;
-        $data['staffs'] = $staffModel->where('status', 1)->findAll();
-        $data['mode'] = 'view';
-
-        return view('appointment/form', $data);
-    }
-
-    // SECURITY
-    if ($sessionRole === 'security') {
-
-        $now = time();
-        $start = strtotime($appointment->appointment_datetime);
-
-        if (!empty($appointment->end_datetime)) {
-            $end = strtotime($appointment->end_datetime);
-        } else {
-            $end = strtotime("+1 hour", $start);
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
         }
 
-        $allowedStart = strtotime("-30 minutes", $start);
+        $sessionRole = session()->get('role');
 
-        if ($now < $allowedStart) {
+        // STAFF / ADMIN
+        if ($sessionRole === 'staff' || $sessionRole === 'admin') {
 
-            return view('appointment/message', [
-                'msg' => 'You have arrived too early.',
-                'type' => 'early'
-            ]);
+            $data['appointment'] = $appointment;
+            $data['admin_id'] = $appointment->admin_id;
+            $data['staffs'] = $staffModel->where('status', 1)->findAll();
+            $data['mode'] = 'view';
+
+            return view('appointment/form', $data);
         }
 
-        if ($now > $end) {
+        // VISITOR
+        if (!$sessionRole) {
 
-            return view('appointment/message', [
-                'msg' => 'Appointment expired.',
-                'type' => 'expired'
-            ]);
+            $data['appointment'] = $appointment;
+            $data['admin_id'] = $appointment->admin_id;
+            $data['staffs'] = $staffModel->where('status', 1)->findAll();
+            $data['mode'] = 'view';
+
+            return view('appointment/form', $data);
         }
 
-        $data['appointment'] = $appointment;
-        $data['admin_id'] = $appointment->admin_id;
-        $data['staffs'] = $staffModel->where('status', 1)->findAll();
-        $data['mode'] = 'view';
+        // // SECURITY
+        // if ($sessionRole === 'security') {
 
-        return view('appointment/form', $data);
+        //     $now = time();
+        //     $start = strtotime($appointment->appointment_datetime);
+
+        //     if (!empty($appointment->end_datetime)) {
+        //         $end = strtotime($appointment->end_datetime);
+        //     } else {
+        //         $end = strtotime("+1 hour", $start);
+        //     }
+
+        //     $allowedStart = strtotime("-30 minutes", $start);
+
+        //     if ($now < $allowedStart) {
+
+        //         return view('appointment/message', [
+        //             'msg' => 'You have arrived too early.',
+        //             'type' => 'early'
+        //         ]);
+        //     }
+
+        //     if ($now > $end) {
+
+        //         return view('appointment/message', [
+        //             'msg' => 'Appointment expired.',
+        //             'type' => 'expired'
+        //         ]);
+        //     }
+
+        //     $data['appointment'] = $appointment;
+        //     $data['admin_id'] = $appointment->admin_id;
+        //     $data['staffs'] = $staffModel->where('status', 1)->findAll();
+        //     $data['mode'] = 'view';
+
+        //     return view('appointment/form', $data);
+        // }
+
+
+        if ($sessionRole === 'security') {
+
+            $now = time();
+            $start = strtotime($appointment->appointment_datetime);
+
+            if (!empty($appointment->end_datetime)) {
+                $end = strtotime($appointment->end_datetime);
+            } else {
+                $end = strtotime("+1 hour", $start);
+            }
+
+            $allowedStart = strtotime("-30 minutes", $start);
+            $time_valid = true;
+
+            // EARLY VISITOR
+            if ($now < $allowedStart) {
+                session()->setFlashdata('error', 'You have arrived too early.');
+                $time_valid = false;
+            }
+
+            // EXPIRED APPOINTMENT
+            if ($now > $end) {
+                session()->setFlashdata('error', 'Your appointment has expired.');
+                $time_valid = false;
+            }
+
+            $data['time_valid'] = $time_valid;
+
+            $data['appointment'] = $appointment;
+            $data['admin_id'] = $appointment->admin_id;
+            $data['staffs'] = $staffModel->where('status', 1)->findAll();
+            $data['mode'] = 'view';
+
+            return view('appointment/form', $data);
+        }
     }
-}
     public function success()
     {
         return "Appointment request submitted successfully!";
