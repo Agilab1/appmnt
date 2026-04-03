@@ -178,31 +178,26 @@ class SecurityController extends BaseController
     }
     public function qrcheckin($id)
     {
-        //     $model = new \App\Models\AppointmentModel();
-        //     $appointment = $model->find($id);
-
-        //     if (!$appointment) {
-        //         return "Invalid QR Code";
-        //     }
-
-        //     // Already checked-in?
-        //     if ($appointment->entry_status == 'Entered') {
-        //         return "Visitor already checked-in";
-        //     }
-
-        //     // Mark as Entered
-        //     $model->update($id, [
-        //         'entry_status' => 'Entered',
-        //         'entry_time'   => date('Y-m-d H:i:s')
-        //     ]);
-
-        //     return redirect()->to(base_url('appointment/view/' . $id));
         $model = new \App\Models\AppointmentModel();
         $appointment = $model->find($id);
 
         if (!$appointment) {
-            return "Invalid QR Code";
+            return redirect()->to(base_url('security/dashboard'))
+                ->with('error', 'Invalid QR Code');
         }
+
+        // already completed visit
+        if ($appointment->entry_status === 'Exited') {
+            return redirect()->to(base_url('appointment/view/' . $id))
+                ->with('error', 'This visitor has already completed the visit.');
+        }
+
+        // appointment not approved
+        if ($appointment->status !== 'Approved') {
+            return redirect()->to(base_url('security/dashboard'))
+                ->with('error', 'Appointment not approved');
+        }
+
         // QR scan flag
         if ($appointment->entry_status === 'Entered') {
 
@@ -217,8 +212,6 @@ class SecurityController extends BaseController
                 'qr_action' => 'checkin'
             ]);
         }
-        //  REMOVE auto check-in logic
-        //  ONLY redirect to view page
 
         return redirect()->to(base_url('appointment/view/' . $id));
     }
