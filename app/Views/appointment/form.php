@@ -33,6 +33,29 @@
         #slotsContainer {
             min-height: 40px;
         }
+
+        .approve-btn {
+            background: #9babd7;
+            /* darker than update button */
+            /* color: white; */
+            border: none;
+            font-weight: 600;
+        }
+
+        .approve-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .reject-btn {
+            background: #9babd7;
+            color: #334155;
+            border: none;
+             font-weight: 600;
+        }
+
+        .reject-btn:hover {
+            background: #e2e8f0;
+        }
     </style>
 
 </head>
@@ -260,14 +283,14 @@
                                         <button type="submit"
                                             formaction="<?= base_url('staff/appointment/approve/' . $appointment->id) ?>"
                                             formmethod="post"
-                                            class="btn btn-success w-50">
+                                            class="btn approve-btn w-50 ">
                                             Approve
                                         </button>
 
                                         <button type="submit"
                                             formaction="<?= base_url('staff/appointment/reject/' . $appointment->id) ?>"
                                             formmethod="post"
-                                            class="btn btn-danger w-50">
+                                            class="btn reject-btn w-50">
                                             Reject
                                         </button>
 
