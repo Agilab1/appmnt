@@ -47,7 +47,6 @@ class AdminAppointments extends BaseController
     {
         $emailService = \Config\Services::email();
         $emailService->clear();
-
         $userEmail = $appointment->email;
         $userName  = $appointment->name;
         $visitorId = $appointment->visitor_id;

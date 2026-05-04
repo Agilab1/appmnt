@@ -2,337 +2,270 @@
 <?= $this->section('content') ?>
 
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <style>
-    #calendarModal .modal-content {
-        border-radius: 1.25rem;
-        overflow: hidden;
-    }
 
-    .calendar-container {
-        border: 1px solid #e9ecef;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, .02);
-    }
+/* GLOBAL */
+html,body{overflow-x:hidden!important;}
+*{box-sizing:border-box;}
+.content-header{display:none!important;}
 
-    .fc-toolbar-title {
-        font-weight: 600;
-    }
+/* CARDS */
+.stat-card{border-radius:14px;padding:20px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+.bg-total{background:linear-gradient(135deg,#4f46e5,#6366f1);}
+.bg-pending{background:linear-gradient(135deg,#facc15,#f59e0b);}
+.bg-approved{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.bg-rejected{background:linear-gradient(135deg,#ef4444,#dc2626);}
+
+/* FILTER */
+.filter-card{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:15px;}
+
+/* TABLE */
+.table-card {
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+.table-header {background: #f8fafc;border-bottom: 1px solid #e5e7eb;}
+
+.custom-table thead th {background: #4a7bdc;color: #ffffff;font-weight: 600;font-size: 13px;}
+.custom-table tbody tr:hover{background:#f9fafb;}
+
+.date-pill{background:#eef2ff;color:#4f46e5;padding:4px 10px;border-radius:8px;font-size:12px;}
+
+.status-badge{padding:4px 10px;border-radius:20px;font-size:12px;}
+.status-badge.approved{background:#dcfce7;color:#16a34a;}
+.status-badge.pending{background:#fef3c7;color:#d97706;}
+.status-badge.rejected{background:#fee2e2;color:#dc2626;}
+
+/* CALENDAR */
+.fc{background:#fff;border-radius:16px;padding:15px;}
+.fc-toolbar-title{font-weight:600;}
+.fc-button{background:#1f2937!important;border:none!important;border-radius:8px!important;}
+.fc-today-button{background:#9ca3af!important;}
+.fc-day-today{background:#fef9c3!important;}
+.fc-event{border-radius:10px!important;padding:6px;font-size:12px;}
+
+.event-approved{background:#22c55e!important;color:#fff;}
+.event-pending{background:#f59e0b!important;color:#fff;}
+.event-rejected{background:#ef4444!important;color:#fff;}
+
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid">
 
-    <h3 class="mb-4">Staff Dashboard</h3>
+<!-- HEADER -->
+<div class="d-flex justify-content-between mb-3">
+<h4 class="fw-bold">Staff Dashboard</h4>
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#calendarModal">View Calendar</button>
+</div>
 
-    <div class="row g-3 mb-4">
+<!-- CARDS -->
+<div class="row g-3 mb-3">
+<div class="col-md-3"><div class="stat-card bg-total"><h6>Total</h6><h2><?= $total ?></h2></div></div>
+<div class="col-md-3"><div class="stat-card bg-pending"><h6>Pending</h6><h2><?= $pending ?></h2></div></div>
+<div class="col-md-3"><div class="stat-card bg-approved"><h6>Approved</h6><h2><?= $approved ?></h2></div></div>
+<div class="col-md-3"><div class="stat-card bg-rejected"><h6>Rejected</h6><h2><?= $rejected ?></h2></div></div>
+</div>
 
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body text-center">
-                    <h6>Total</h6>
-                    <h2><?= $total ?></h2>
-                </div>
-            </div>
-        </div>
+<!-- FILTER -->
+<div class="filter-card mb-3">
+<form method="get">
 
-        <div class="col-md-3">
-            <div class="card text-dark bg-warning">
-                <div class="card-body text-center">
-                    <h6>Pending</h6>
-                    <h2><?= $pending ?></h2>
-                </div>
-            </div>
-        </div>
+<div class="row g-2 align-items-center">
 
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body text-center">
-                    <h6>Approved</h6>
-                    <h2><?= $approved ?></h2>
-                </div>
-            </div>
-        </div>
+<div class="col-md-6">
+<input type="text" id="singleDate" class="form-control"
+value="<?= $_GET['from'] ?? '' ?>" placeholder="Select Date">
 
-        <div class="col-md-3">
-            <div class="card text-white bg-danger">
-                <div class="card-body text-center">
-                    <h6>Rejected</h6>
-                    <h2><?= $rejected ?></h2>
-                </div>
-            </div>
-        </div>
+<input type="hidden" name="from" id="fromDate">
+<input type="hidden" name="to" id="toDate">
+</div>
 
-    </div>
-
-
-    <!-- DATE FILTER -->
-
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-
-            <form method="get" action="<?= base_url('staff/dashboard') ?>">
-
-                <div class="row g-3 align-items-end">
-
-                    <div class="col-md-3">
-                        <label>From Date</label>
-                        <input type="text" id="fromDate" name="from" class="form-control" value="<?= $_GET['from'] ?? '' ?>">
-                    </div>
-
-                    <div class="col-md-3">
-                        <label>To Date</label>
-                        <input type="text" id="toDate" name="to" class="form-control" value="<?= $_GET['to'] ?? '' ?>">
-                    </div>
-
-                    <div class="col-md-3">
-                        <button class="btn btn-primary w-100">Filter</button>
-                    </div>
-
-                    <div class="col-md-3">
-                        <a href="<?= base_url('staff/dashboard') ?>" class="btn btn-secondary w-100">Reset</a>
-                    </div>
-
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-
-        <h4 class="mb-0">My Appointments</h4>
-
-        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#calendarModal">
-            📅 View Calendar
-        </button>
-
-    </div>
-
-
-    <!-- APPOINTMENT TABLE -->
-
-    <div class="card">
-        <div class="card-body p-0">
-
-            <table class="table table-striped table-bordered datatable mb-0">
-
-                <thead class="table-primary">
-
-                    <tr>
-                        <th>Visitor ID</th>
-                        <th>Name</th>
-                        <th>Mobile</th>
-                        <th>Appointment</th>
-                        <th>Agenda</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <?php if (!empty($appointments)): foreach ($appointments as $row): ?>
-
-                            <tr>
-
-                                <td>
-                                    <a href="<?= base_url('appointment/view/' . $row->id) ?>">
-                                        <?= esc($row->visitor_id) ?>
-                                    </a>
-                                </td>
-
-                                <td><?= esc($row->name) ?></td>
-                                <td><?= esc($row->mobile) ?></td>
-
-                                <td><?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?></td>
-
-                                <td><?= esc($row->purpose) ?></td>
-
-                                <td>
-
-                                    <?php if ($row->status == 'Pending'): ?>
-                                        <span class="badge bg-warning">Pending</span>
-                                    <?php elseif ($row->status == 'Approved'): ?>
-                                        <span class="badge bg-success">Approved</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-danger">Rejected</span>
-                                    <?php endif; ?>
-
-                                </td>
-
-                                <td>
-
-                                    <?php if ($row->status == 'Pending'): ?>
-
-                                        <a href="<?= base_url('staff/appointment/approve/' . $row->id) ?>"
-                                            class="btn btn-success btn-sm">Approve</a>
-
-                                        <a href="<?= base_url('staff/appointment/reject/' . $row->id) ?>"
-                                            class="btn btn-danger btn-sm">Reject</a>
-
-                                    <?php else: ?> - <?php endif; ?>
-
-                                </td>
-
-                            </tr>
-
-                        <?php endforeach;
-                    else: ?>
-
-                        <tr>
-                            <td colspan="7" class="text-center">No appointments found</td>
-                        </tr>
-
-                    <?php endif; ?>
-
-                </tbody>
-
-            </table>
-
-        </div>
-    </div>
+<div class="col-md-6 d-flex justify-content-end gap-2">
+<button class="btn btn-dark px-4">Apply</button>
+<a href="<?= base_url('staff/dashboard') ?>" class="btn btn-secondary px-4">Reset</a>
+</div>
 
 </div>
 
+</form>
+</div>
 
-<!-- CALENDAR MODAL -->
+<!-- TABLE -->
+<div class="card table-card border-0">
+<div class="card-header table-header"><b>My Appointments</b></div>
 
+<div class="table-responsive">
+<table class="table custom-table mb-0">
+
+<thead>
+<tr>
+<th>Visitor ID</th>
+<th>Name</th>
+<th>Mobile</th>
+<th>Appointment</th>
+<th>Agenda</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+<?php foreach($appointments as $row): ?>
+<tr>
+
+<td><a href="<?= base_url('appointment/view/'.$row->id) ?>"><?= $row->visitor_id ?></a></td>
+<td><?= $row->name ?></td>
+<td><?= $row->mobile ?></td>
+
+<td><span class="date-pill"><?= date('d M Y h:i A',strtotime($row->appointment_datetime)) ?></span></td>
+<td><?= $row->purpose ?></td>
+
+<td>
+<span class="status-badge <?= strtolower($row->status) ?>">
+<?= $row->status ?>
+</span>
+</td>
+
+<td>
+<?php if($row->status=='Pending'): ?>
+<a href="<?= base_url('staff/appointment/approve/'.$row->id) ?>" class="btn btn-success btn-sm">Approve</a>
+<a href="<?= base_url('staff/appointment/reject/'.$row->id) ?>" class="btn btn-danger btn-sm">Reject</a>
+<?php else: ?>-<?php endif; ?>
+</td>
+
+</tr>
+<?php endforeach; ?>
+</tbody>
+
+</table>
+</div>
+</div>
+
+</div>
+
+<!-- CALENDAR -->
 <div class="modal fade" id="calendarModal">
+<div class="modal-dialog modal-xl modal-dialog-centered">
+<div class="modal-content p-3">
 
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-
-        <div class="modal-content border-0 shadow-lg">
-
-            <div class="modal-header">
-                <h5 class="fw-bold">Professional Scheduler</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-
-                    <div class="d-flex gap-2">
-                        <input type="text" id="calendarDate" class="form-control" style="width:200px">
-                        <button class="btn btn-primary" onclick="goToDate()">Go</button>
-                    </div>
-
-                    <div>
-                        <span class="badge bg-success">Approved</span>
-                        <span class="badge bg-warning text-dark">Pending</span>
-                        <span class="badge bg-danger">Rejected</span>
-                    </div>
-
-                </div>
-
-                <div class="calendar-container bg-light rounded-3 p-3">
-                    <div id="calendar"></div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
+<div class="modal-header border-0">
+<h5>Professional Scheduler</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
+<div class="modal-body">
+<div id="calendar"></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- 🔥 ADVANCED POPUP -->
+<div class="modal fade" id="eventModal">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content p-4" style="border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,0.2);">
+
+<div class="d-flex justify-content-between mb-2">
+<h5 class="fw-bold">Appointment Detail</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div style="background:#f8fafc;padding:12px;border-radius:10px;">
+<p><b>Visitor:</b> <span id="e_name"></span></p>
+<p><b>Visitor ID:</b> <span id="e_id"></span></p>
+<p><b>Date:</b> <span id="e_date"></span></p>
+<p><b>Purpose:</b> <span id="e_purpose"></span></p>
+<p><b>Contact:</b> <span id="e_mobile"></span></p>
+</div>
+
+<div class="d-flex gap-2 mt-3">
+<a id="editBtn" class="btn btn-primary w-100">Edit</a>
+<a id="approveBtn" class="btn btn-success w-100">Approve</a>
+<a id="rejectBtn" class="btn btn-danger w-100">Reject</a>
+</div>
+
+</div>
+</div>
+</div>
 
 <?= $this->endSection() ?>
 
-
 <?= $this->section('custom'); ?>
 
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
-    $(document).ready(function() {
 
-        flatpickr("#fromDate", {
-            dateFormat: "Y-m-d",
-            maxDate: "today"
-        });
-        flatpickr("#toDate", {
-            dateFormat: "Y-m-d",
-            maxDate: "today"
-        });
-        flatpickr("#calendarDate", {
-            dateFormat: "Y-m-d",
-            defaultDate: new Date()
-        });
+// DATE FILTER
+flatpickr("#singleDate",{
+dateFormat:"Y-m-d",
+defaultDate:"today",
+onChange:function(selectedDates,dateStr){
+fromDate.value=dateStr;
+toDate.value=dateStr;
+}
+});
 
-    });
+let calendar;
 
+document.addEventListener('DOMContentLoaded',function(){
 
-    let calendar;
+calendar=new FullCalendar.Calendar(document.getElementById('calendar'),{
 
-    document.addEventListener('DOMContentLoaded', function() {
+initialView:'timeGridWeek',
 
-        let calendarEl = document.getElementById('calendar');
+headerToolbar:{
+left:'prev,next today',
+center:'title',
+right:'timeGridDay,timeGridWeek,dayGridMonth'
+},
 
-        if (calendarEl) {
+height:650,
+nowIndicator:true,
+allDaySlot:false,
+slotMinTime:"09:00:00",
+slotMaxTime:"20:00:00",
 
-            calendar = new FullCalendar.Calendar(calendarEl, {
+events: <?= $calendarEvents ?? '[]' ?>,
 
-                initialView: 'timeGridWeek',
+eventDidMount:function(info){
+let s=info.event.extendedProps.status;
+if(s=='Approved') info.el.classList.add('event-approved');
+if(s=='Pending') info.el.classList.add('event-pending');
+if(s=='Rejected') info.el.classList.add('event-rejected');
+},
 
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
-                },
+/* 🔥 FINAL POPUP */
+eventClick:function(info){
 
-                height: 650,
-                nowIndicator: true,
-                allDaySlot: false,
-                slotMinTime: "09:00:00",
-                slotMaxTime: "20:00:00",
-                expandRows: true,
+let e=info.event.extendedProps;
 
-                events: <?= $calendarEvents ?? '[]' ?>,
+e_name.innerText=info.event.title;
+e_id.innerText=e.visitor_id;
+e_date.innerText=info.event.start.toLocaleString();
+e_purpose.innerText=e.purpose;
+e_mobile.innerText=e.mobile;
 
-                eventClick: function(info) {
+editBtn.href="<?= base_url('appointment/view/') ?>"+e.id;
+approveBtn.href="<?= base_url('staff/appointment/approve/') ?>"+e.id;
+rejectBtn.href="<?= base_url('staff/appointment/reject/') ?>"+e.id;
 
-                    let e = info.event.extendedProps;
+new bootstrap.Modal(document.getElementById('eventModal')).show();
+}
 
-                    alert(
-                        "Visitor: " + info.event.title +
-                        "\nMobile: " + e.mobile +
-                        "\nPurpose: " + e.purpose +
-                        "\nStatus: " + e.status
-                    );
+});
 
-                }
+});
 
-            });
+document.addEventListener('shown.bs.modal',function(e){
+if(e.target.id==='calendarModal') calendar.render();
+});
 
-        }
-
-    });
-
-
-    function goToDate() {
-
-        let d = document.getElementById('calendarDate').value;
-
-        if (calendar) calendar.gotoDate(d);
-
-    }
-
-
-    document.addEventListener('shown.bs.modal', function(e) {
-
-        if (e.target.id === 'calendarModal' && calendar) {
-
-            calendar.render();
-
-        }
-
-    });
 </script>
 
 <?= $this->endSection(); ?>

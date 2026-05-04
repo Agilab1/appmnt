@@ -10,228 +10,229 @@ if ($role === 'admin') {
 }
 
 $initials = '';
-
 if (!empty($name)) {
     $parts = explode(' ', trim($name));
     $initials = strtoupper(
         substr($parts[0], 0, 1) .
-        (isset($parts[1]) ? substr($parts[1], 0, 1) : '')
+            (isset($parts[1]) ? substr($parts[1], 0, 1) : '')
     );
 }
 ?>
+<style>
+    .header-wrapper {
+        width: 100%;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+        .header-wrapper {
+            margin-left: 0;
+            padding: 10px;
+        }
+    }
 
 
+    .app-header {
+        height: 60px;
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
 
-     <!--begin::Header-->
-     <nav class="app-header navbar navbar-expand bg-body">
-       <!--begin::Container-->
-       <div class="container-fluid">
-         <!--begin::Start Navbar Links-->
-         <ul class="navbar-nav">
-           <li class="nav-item">
-             <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-               <i class="bi bi-list"></i>
-             </a>
-           </li>
-           <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Home</a></li>
-           <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Contact</a></li>
-         </ul>
-         <!--end::Start Navbar Links-->
-         <!--begin::End Navbar Links-->
-         <ul class="navbar-nav ms-auto">
-           <!--begin::Navbar Search-->
-           <li class="nav-item">
-             <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-               <i class="bi bi-search"></i>
-             </a>
-           </li>
-           <!--end::Navbar Search-->
-           <!--begin::Messages Dropdown Menu-->
-           <li class="nav-item dropdown">
-             <a class="nav-link" data-bs-toggle="dropdown" href="#">
-               <i class="bi bi-chat-text"></i>
-               <span class="navbar-badge badge text-bg-danger">3</span>
-             </a>
-             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-               <a href="#" class="dropdown-item">
-                 <!--begin::Message-->
-                 <div class="d-flex">
-                   <div class="flex-shrink-0">
-                     <img
-                       src="public/assets/dist/assets/img/user1-128x128.jpg"
-                       alt="User Avatar"
-                       class="img-size-50 rounded-circle me-3" />
-                   </div>
-                   <div class="flex-grow-1">
-                     <h3 class="dropdown-item-title">
-                       Brad Diesel
-                       <span class="float-end fs-7 text-danger"><i class="bi bi-star-fill"></i></span>
-                     </h3>
-                     <p class="fs-7">Call me whenever you can...</p>
-                     <p class="fs-7 text-secondary">
-                       <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
-                     </p>
-                   </div>
-                 </div>
-                 <!--end::Message-->
-               </a>
-               <div class="dropdown-divider"></div>
-               <a href="#" class="dropdown-item">
-                 <!--begin::Message-->
-                 <div class="d-flex">
-                   <div class="flex-shrink-0">
-                     <img
-                       src="public/assets/dist/assets/img/user8-128x128.jpg"
-                       alt="User Avatar"
-                       class="img-size-50 rounded-circle me-3" />
-                   </div>
-                   <div class="flex-grow-1">
-                     <h3 class="dropdown-item-title">
-                       John Pierce
-                       <span class="float-end fs-7 text-secondary">
-                         <i class="bi bi-star-fill"></i>
-                       </span>
-                     </h3>
-                     <p class="fs-7">I got your message bro</p>
-                     <p class="fs-7 text-secondary">
-                       <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
-                     </p>
-                   </div>
-                 </div>
-                 <!--end::Message-->
-               </a>
-               <div class="dropdown-divider"></div>
-               <a href="#" class="dropdown-item">
-                 <!--begin::Message-->
-                 <div class="d-flex">
-                   <div class="flex-shrink-0">
-                     <img
-                       src="public/assets/dist/assets/img/user3-128x128.jpg"
-                       alt="User Avatar"
-                       class="img-size-50 rounded-circle me-3" />
-                   </div>
-                   <div class="flex-grow-1">
-                     <h3 class="dropdown-item-title">
-                       Nora Silvester
-                       <span class="float-end fs-7 text-warning">
-                         <i class="bi bi-star-fill"></i>
-                       </span>
-                     </h3>
-                     <p class="fs-7">The subject goes here</p>
-                     <p class="fs-7 text-secondary">
-                       <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
-                     </p>
-                   </div>
-                 </div>
-                 <!--end::Message-->
-               </a>
-               <div class="dropdown-divider"></div>
-               <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-             </div>
-           </li>
-           <!--end::Messages Dropdown Menu-->
-           <!--begin::Notifications Dropdown Menu-->
-           <li class="nav-item dropdown">
-             <a class="nav-link" data-bs-toggle="dropdown" href="#">
-               <i class="bi bi-bell-fill"></i>
-               <span class="navbar-badge badge text-bg-warning">15</span>
-             </a>
-             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-               <span class="dropdown-item dropdown-header">15 Notifications</span>
-               <div class="dropdown-divider"></div>
-               <a href="#" class="dropdown-item">
-                 <i class="bi bi-envelope me-2"></i> 4 new messages
-                 <span class="float-end text-secondary fs-7">3 mins</span>
-               </a>
-               <div class="dropdown-divider"></div>
-               <a href="#" class="dropdown-item">
-                 <i class="bi bi-people-fill me-2"></i> 8 friend requests
-                 <span class="float-end text-secondary fs-7">12 hours</span>
-               </a>
-               <div class="dropdown-divider"></div>
-               <a href="#" class="dropdown-item">
-                 <i class="bi bi-file-earmark-fill me-2"></i> 3 new reports
-                 <span class="float-end text-secondary fs-7">2 days</span>
-               </a>
-               <div class="dropdown-divider"></div>
-               <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
-             </div>
-           </li>
-           <!--end::Notifications Dropdown Menu-->
-           <!--begin::Fullscreen Toggle-->
-           <li class="nav-item">
-             <a class="nav-link" href="#" data-lte-toggle="fullscreen">
-               <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
-               <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
-             </a>
-           </li>
-           <!--end::Fullscreen Toggle-->
-           <!--begin::User Menu Dropdown-->
-           <li class="nav-item dropdown user-menu">
-             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
+    /* ================= LEFT SIDE ================= */
 
-               <!-- INITIALS AVATAR -->
-               <div
-                 class="rounded-circle d-flex align-items-center justify-content-center"
-                 style="
-      width: 35px;
-      height: 35px;
-      background-color: #6e7887;
-      color: #fff;
-      font-weight: 600;
-      font-size: 14px;
-      flex-shrink: 0;
-    ">
-                 <?= esc($initials) ?>
-               </div>
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
 
-               <!-- USER NAME -->
-               <span class="d-none d-md-inline fw-semibold text-dark">
-                 <?= esc($name) ?>
+    /* MENU ICON */
+    .header-left a i {
+        cursor: pointer;
+    }
 
-               </span>
+    /* ================= SEARCH BOX ================= */
 
-             </a>
+    .search-box {
+        background: #f1f5f9;
+        border-radius: 25px;
+        padding: 6px 14px;
+        display: flex;
+        align-items: center;
+        width: 260px;
+        transition: 0.2s;
+    }
 
-             <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-               <!--begin::User Image-->
-               <li class="user-header text-bg-primary text-center">
+    .search-box:hover {
+        background: #e2e8f0;
+    }
 
-                 <!-- INITIALS AVATAR -->
-                 <div
-                   class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2"
-                   style=" width: 80px; height: 80px; background-color: #ffffff; color: #0d6efd; font-size: 28px; font-weight: 700;">
+    .search-box input {
+        border: none;
+        outline: none;
+        background: transparent;
+        margin-left: 8px;
+        font-size: 13px;
+        width: 100%;
+    }
 
-                   <?= esc($initials) ?>
-                 </div>
+    /* ================= RIGHT SIDE ================= */
 
-                 <!-- USER NAME -->
-                 <p class="mb-0 fw-semibold">
-                   <?= esc($name) ?>
-                 </p>
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
 
-               </li>
+    /* ================= ICONS ================= */
 
-               <!--end::User Image-->
-               <!--begin::Menu Body-->
-               <li class="user-body">
-                 <!--begin::Row-->
+    .header-icon {
+        font-size: 18px;
+        color: #6b7280;
+        position: relative;
+        cursor: pointer;
+        transition: 0.2s;
+    }
 
-                 <!--end::Row-->
-               </li>
-               <!--end::Menu Body-->
-               <!--begin::Menu Footer-->
-               <li class="user-footer">
-                 <a href="#" class="btn btn-default btn-flat">Profile</a>
-                 <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
-               </li>
-               <!--end::Menu Footer-->
-             </ul>
-           </li>
-           <!--end::User Menu Dropdown-->
-         </ul>
-         <!--end::End Navbar Links-->
-       </div>
-       <!--end::Container-->
-     </nav>
-     <!--end::Header-->
+    .header-icon:hover {
+        color: #111827;
+    }
+
+    /* ================= BADGE ================= */
+
+    .header-badge {
+        position: absolute;
+        top: -5px;
+        right: -6px;
+        font-size: 10px;
+        padding: 2px 5px;
+        border-radius: 50%;
+    }
+
+    /* ================= USER ================= */
+
+    .user-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    /* AVATAR */
+    .avatar {
+        width: 34px;
+        height: 34px;
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        border-radius: 50%;
+        color: #fff;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+
+    /* USERNAME */
+    .username {
+        font-size: 14px;
+        font-weight: 500;
+        color: #111827;
+    }
+
+    /* ================= DROPDOWN ================= */
+
+    .dropdown-menu {
+        border-radius: 12px;
+        padding: 10px 0;
+    }
+
+    .dropdown-menu .btn {
+        border-radius: 6px;
+    }
+
+    /* ================= EXTRA FIX ================= */
+
+    /* prevent overflow */
+    .app-header,
+    .header-wrapper {
+        max-width: 100%;
+    }
+
+    /* smooth transition */
+    * {
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+<!-- 🔥 WRAPPER -->
+<div class="header-wrapper">
+
+    <nav class="app-header">
+
+        <!-- LEFT -->
+        <div class="header-left">
+
+            <a href="#" data-lte-toggle="sidebar">
+                <i class="bi bi-list fs-4 text-dark"></i>
+            </a>
+
+            <div class="search-box d-none d-md-flex">
+                <i class="bi bi-search text-secondary"></i>
+                <input type="text" placeholder="Search anything...">
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="header-right">
+
+            <i class="bi bi-search header-icon d-md-none"></i>
+
+            <div class="position-relative">
+                <i class="bi bi-chat-dots header-icon"></i>
+                <span class="badge bg-danger header-badge">3</span>
+            </div>
+
+            <div class="position-relative">
+                <i class="bi bi-bell header-icon"></i>
+                <span class="badge bg-warning text-dark header-badge">15</span>
+            </div>
+
+            <a href="#" data-lte-toggle="fullscreen">
+                <i class="bi bi-arrows-fullscreen header-icon"></i>
+            </a>
+
+            <!-- USER -->
+            <div class="dropdown">
+                <a href="#" class="user-box" data-bs-toggle="dropdown">
+                    <span class="username d-none d-md-inline"><?= esc($name) ?></span>
+                    <div class="avatar"><?= esc($initials) ?></div>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li class="text-center p-3">
+                        <div class="avatar mx-auto mb-2" style="width:50px;height:50px;">
+                            <?= esc($initials) ?>
+                        </div>
+                        <b><?= esc($name) ?></b><br>
+                        <small><?= ucfirst($role) ?></small>
+                    </li>
+                    <li>
+                        <hr>
+                    </li>
+                    <li class="d-flex justify-content-between px-3 pb-2">
+                        <a href="#" class="btn btn-sm btn-outline-primary">Profile</a>
+                        <a href="<?= base_url('logout') ?>" class="btn btn-sm btn-danger">Logout</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </nav>
+
+</div>

@@ -8,55 +8,100 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+ body {
+    background: #eef2f7;
+}
 
-    <style>
-        .inline-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+/* CARD */
+.card {
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+}
 
-        .spinner-input {
-            width: 70px;
-            text-align: center;
-        }
+/* HEADER (MODERN) */
+.card-header {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    border: none;
+    border-radius: 18px 18px 0 0;
+}
 
-        .unit-text {
-            font-size: 14px;
-        }
+.card-header h5 {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
 
-        .slot-btn {
-            min-width: 85px;
-            font-size: 13px;
-        }
+/* INPUT */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    transition: 0.2s;
+}
 
-        #slotsContainer {
-            min-height: 40px;
-        }
+.form-control:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79,70,229,0.1);
+}
 
-        .approve-btn {
-            background: #9babd7;
-            /* darker than update button */
-            /* color: white; */
-            border: none;
-            font-weight: 600;
-        }
+/* LABEL */
+.form-label {
+    font-weight: 500;
+    color: #374151;
+}
 
-        .approve-btn:hover {
-            background: #e2e8f0;
-        }
+/* SLOT BUTTON */
+.slot-btn {
+    min-width: 85px;
+    font-size: 12px;
+    border-radius: 8px;
+}
 
-        .reject-btn {
-            background: #9babd7;
-            color: #334155;
-            border: none;
-             font-weight: 600;
-        }
+/* BUTTON MAIN */
+.btn-primary {
+    background: linear-gradient(135deg,#4f46e5,#6366f1);
+    border: none;
+}
 
-        .reject-btn:hover {
-            background: #e2e8f0;
-        }
-    </style>
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* APPROVE / REJECT */
+.approve-btn {
+    background: #3b82f6;
+    color: white;
+    border-radius: 10px;
+}
+
+.reject-btn {
+    background: #ef4444;
+    color: white;
+    border-radius: 10px;
+}
+
+/* INLINE */
+.inline-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.spinner-input {
+    width: 70px;
+    text-align: center;
+}
+
+/* SLOT CONTAINER */
+#slotsContainer {
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* TEXTAREA */
+textarea {
+    border-radius: 10px;
+}
+</style>
 
 </head>
 

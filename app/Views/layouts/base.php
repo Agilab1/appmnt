@@ -77,40 +77,56 @@
 
 
 
-  <style>
-    body {
-      overflow-x: auto;
-    }
+<style>
+html, body {
+    overflow-x: hidden !important;
+}
 
-    .app-wrapper,
-    .app-main {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
+/* MAIN WRAPPER */
+.app-wrapper {
+    overflow-x: hidden;
+}
 
-    .app-main>.row {
-      margin-left: 0;
-      margin-right: 0;
-    }
+/* ================= SIDEBAR ================= */
 
-    body>.row {
-      margin-left: 0;
-      margin-right: 0;
-    }
+.app-sidebar {
+    width: 260px;
+}
 
+/* ================= HEADER ================= */
+
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    right: 0;
+    height: 60px;
+    z-index: 1030;
+}
+
+/* ================= MAIN CONTENT ================= */
+
+.app-main {
+    margin-top: 60px;
+    margin-left: 260px;
+    padding: 15px;
+    width: calc(100% - 260px);
+    background: #eef2f7;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
     .app-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1030;
-      width: 100%;
+        left: 0;
     }
 
     .app-main {
-      margin-top: 70px;
+        margin-left: 0;
+        width: 100%;
     }
-  </style>
+}
+</style>
 
 </head>
 <!--end::Head-->
@@ -126,11 +142,11 @@
     <!--begin::App Main-->
     <main class="app-main">
       <!--begin::App Content Header-->
-      <div class="app-content-header">
-        <!--begin::Container-->
-        <div class="container-fluid">
-          <!--begin::Row-->
-          <div class="row">
+      <!-- <div class="app-content-header"> -->
+      <!--begin::Container-->
+      <!-- <div class="container-fluid">
+          begin::Row-->
+      <!-- <div class="row">
             <div class="col-sm-6">
               <h3 class="mb-0">Dashboard</h3>
             </div>
@@ -140,11 +156,11 @@
                 <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
               </ol>
             </div>
-          </div>
-          <!--end::Row-->
-        </div>
-        <!--end::Container-->
-      </div>
+          </div> -->
+      <!--end::Row-->
+      <!-- </div> -->
+      <!--end::Container-->
+      <!-- </div> -->
       <!--end::App Content Header-->
       <div class="row">
         <?= $this->renderSection('dashboard'); ?>
