@@ -104,10 +104,24 @@
     <div class="d-flex justify-content-between mb-3">
         <h4 class="fw-bold">Security Dashboard</h4>
 
+
         <a href="<?= base_url('security/scan') ?>" class="btn btn-primary">
             Scan QR
         </a>
+
     </div>
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success">
+            <?= session()->getFlashdata('success') ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger">
+            <?= session()->getFlashdata('error') ?>
+        </div>
+    <?php endif; ?>
+
 
     <!-- CARDS -->
     <div class="row g-3 mb-3">
@@ -240,6 +254,11 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('custom'); ?>
+<script>
+  setTimeout(function() {
+        $('.alert').fadeOut('slow');
+    }, 4000); // 4 seconds
+</script>
 
 <!-- ✅ DATATABLE JS -->
 <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> -->
