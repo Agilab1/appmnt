@@ -96,6 +96,9 @@
         background: #fef3c7;
         color: #d97706;
     }
+    .status-filter {
+    cursor: pointer;
+}
 </style>
 
 <div class="container-fluid">
@@ -159,7 +162,7 @@
     <!-- FILTER -->
     <div class="filter-card mb-3 d-flex gap-2 align-items-center">
 
-        <input type="text" id="filterDate" class="form-control" style="width:200px;">
+        <input type="text" id="filterDate" class="form-control" placeholder="Select Date" style="width:200px;">
 
         <div class="dropdown">
             <button class="btn btn-dark dropdown-toggle" id="statusBtn" data-bs-toggle="dropdown">
@@ -175,6 +178,7 @@
         </div>
 
     </div>
+
 
     <!-- TABLE -->
     <div class="card table-card border-0">
@@ -254,10 +258,73 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('custom'); ?>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-  setTimeout(function() {
+    setTimeout(function() {
         $('.alert').fadeOut('slow');
     }, 4000); // 4 seconds
+
+    $(document).ready(function() {
+
+                flatpickr("#filterDate", {
+                    dateFormat: "Y-m-d",
+                    allowInput: true
+                });
+
+
+
+                window.filterType = "all";
+
+                $.fn.dataTable.ext.search.push(function(settings, data) {
+
+                    let selectedDate = $('#filterDate').val();
+                    let appointmentDate = data[3];
+
+                    if (selectedDate && appointmentDate) {
+                        let rowDate = new Date(appointmentDate);
+                        let filterDate = new Date(selectedDate);
+
+                        if (
+                            rowDate.getFullYear() !== filterDate.getFullYear() ||
+                            rowDate.getMonth() !== filterDate.getMonth() ||
+                            rowDate.getDate() !== filterDate.getDate()
+                        ) {
+                            return false;
+                        }
+                    }
+
+                    let inTime = data[6];
+                    let outTime = data[7];
+
+                    if (window.filterType === 'checkin') {
+                        return (inTime && inTime !== "-") && (!outTime || outTime === "-");
+                    }
+
+                    if (window.filterType === 'checkout') {
+                        return outTime && outTime !== "-";
+                    }
+
+                    if (window.filterType === 'pending') {
+                        return (!inTime || inTime === "-") && (!outTime || outTime === "-");
+                    }
+
+                    return true;
+                });
+
+                // STATUS CLICK
+                $(document).on('click', '.status-filter', function() {
+                    window.filterType = $(this).data('type');
+                    $('#statusBtn').text($(this).text());
+
+                    $('#dtbl').DataTable().draw();
+                });
+
+                // DATE CHANGE
+                $('#filterDate').on('change', function() {
+                    $('#dtbl').DataTable().draw();
+                });
+
+    });
 </script>
 
 <!-- ✅ DATATABLE JS -->
