@@ -3,7 +3,7 @@
 <!--begin::Head-->
 
 <head>
-  
+
   <!-- <base href="http://localhost/appmnt/"> -->
   <base href="https://agilesaptech.com/appmnt/">
   <!--  -->
@@ -77,56 +77,57 @@
 
 
 
-<style>
-html, body {
-    overflow-x: hidden !important;
-}
-
-/* MAIN WRAPPER */
-.app-wrapper {
-    overflow-x: hidden;
-}
-
-/* ================= SIDEBAR ================= */
-
-.app-sidebar {
-    width: 260px;
-}
-
-/* ================= HEADER ================= */
-
-.app-header {
-    position: fixed;
-    top: 0;
-    left: 260px;
-    right: 0;
-    height: 60px;
-    z-index: 1030;
-}
-
-/* ================= MAIN CONTENT ================= */
-
-.app-main {
-    margin-top: 60px;
-    margin-left: 260px;
-    padding: 15px;
-    width: calc(100% - 260px);
-    background: #eef2f7;
-}
-
-/* ================= MOBILE ================= */
-
-@media (max-width: 768px) {
-    .app-header {
-        left: 0;
+  <style>
+    html,
+    body {
+      overflow-x: hidden !important;
     }
+
+    /* MAIN WRAPPER */
+    .app-wrapper {
+      overflow-x: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+
+    .app-sidebar {
+      width: 260px;
+    }
+
+    /* ================= HEADER ================= */
+
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 260px;
+      right: 0;
+      height: 60px;
+      z-index: 1030;
+    }
+
+    /* ================= MAIN CONTENT ================= */
 
     .app-main {
+      margin-top: 60px;
+      margin-left: 260px;
+      padding: 15px;
+      width: calc(100% - 260px);
+      background: #eef2f7;
+    }
+
+    /* ================= MOBILE ================= */
+
+    @media (max-width: 768px) {
+      .app-header {
+        left: 0;
+      }
+
+      .app-main {
         margin-left: 0;
         width: 100%;
+      }
     }
-}
-</style>
+  </style>
 
 </head>
 <!--end::Head-->
