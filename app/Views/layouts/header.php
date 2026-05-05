@@ -209,7 +209,7 @@ if (!empty($name)) {
             <!-- USER -->
             <div class="dropdown">
                 <a href="#" class="user-box" data-bs-toggle="dropdown">
-                    <span class="username d-none d-md-inline"><?= esc($name) ?></span>
+                    <!-- <span class="username d-none d-md-inline"><?= esc($name) ?></span> -->
                     <div class="avatar"><?= esc($initials) ?></div>
                 </a>
 

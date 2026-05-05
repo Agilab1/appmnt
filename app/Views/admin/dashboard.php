@@ -3,7 +3,7 @@
 
 <div class="container mt-4">
 
-    <h3 class="mb-4">
+    <h3 class="mb-4 fw-bold">
         Welcome, <?= esc(session()->get('admin_name')) ?>
     </h3>
 

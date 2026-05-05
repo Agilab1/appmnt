@@ -3,7 +3,7 @@
 <!--begin::Head-->
 
 <head>
-  <!-- <base href="http://agilesaptech.com/pms/"> -->
+  
   <!-- <base href="http://localhost/appmnt/"> -->
   <base href="https://agilesaptech.com/appmnt/">
   <!--  -->
