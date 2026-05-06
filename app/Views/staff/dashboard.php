@@ -152,12 +152,18 @@
 <div class="container-fluid">
 
     <!-- HEADER -->
-    <div class="d-flex justify-content-between mb-3">
-        <!-- <h4 class="fw-bold">Staff Dashboard</h4> -->
-        <h3 class="mb-4 fw-bold">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h3 class="mb-0 fw-bold">
             Welcome, <?= esc(session()->get('staff_name')) ?>
         </h3>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#calendarModal">View Calendar</button>
+
+        <button class="btn btn-primary py-2 px-3"
+            data-bs-toggle="modal"
+            data-bs-target="#calendarModal">
+            View Calendar
+        </button>
+
     </div>
 
     <!-- CARDS -->
@@ -350,7 +356,7 @@
             slotMaxTime: "20:00:00",
 
 
-            
+
 
             events: <?= $calendarEvents ?? '[]' ?>,
 
@@ -386,8 +392,6 @@
     document.addEventListener('shown.bs.modal', function(e) {
         if (e.target.id === 'calendarModal') calendar.render();
     });
-
-
 </script>
 
 <?= $this->endSection(); ?>
