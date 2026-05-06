@@ -26,22 +26,19 @@
 
 
   /* BRAND SECTION FIX */
-  .sidebar-brand {
-    padding: 12px 15px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-  }
+ .sidebar-brand {
+    width: 100%;
+    padding: 10px 0;
+}
 
-  /* LOGO FIX (MAIN) */
-  .sidebar-logo {
-    max-width: 160px;
-    /* control width */
+.sidebar-logo {
+     width: 100%;
+    max-width: 220px;
     height: auto;
     object-fit: contain;
     display: block;
-  }
+    margin: 0 auto;     /* center align */
+}
 
   /* REMOVE EXTRA SPACE */
   .brand-link {
@@ -50,6 +47,12 @@
     justify-content: center;
     padding: 0 !important;
   }
+  .sidebar-brand .brand-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
 
   /* OPTIONAL: logo container spacing */
   .sidebar-brand img {
@@ -137,13 +140,13 @@
 
 <aside class="app-sidebar shadow" data-bs-theme="dark">
 
-  <div class="sidebar-brand">
-    <a href="<?= base_url('admin/dashboard'); ?>" class="brand-link text-decoration-none">
-      <img src="<?= base_url('public/assets/dist/assets/img/MainLOGO.png'); ?>"
-        alt="Logo"
-        class="sidebar-logo" />
+ <div class="sidebar-brand d-flex justify-content-center align-items-center">
+    <a href="<?= base_url('admin/dashboard'); ?>" class="brand-link text-decoration-none w-100 text-center">
+        <img src="<?= base_url('public/assets/dist/assets/img/MainLOGO.png'); ?>"
+            alt="Logo"
+            class="sidebar-logo" />
     </a>
-  </div>
+</div>
 
   <div class="sidebar-content">
     <?= $this->include('layouts/sidemenu'); ?>
