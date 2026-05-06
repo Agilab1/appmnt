@@ -139,7 +139,7 @@
 
   <div class="sidebar-brand">
     <a href="<?= base_url('admin/dashboard'); ?>" class="brand-link text-decoration-none">
-      <img src="<?= base_url('public/assets/dist/assets/img/AppointmentUpdatedLOGO.png'); ?>"
+      <img src="<?= base_url('public/assets/dist/assets/img/MainLOGO.png'); ?>"
         alt="Logo"
         class="sidebar-logo" />
     </a>
@@ -167,7 +167,7 @@ foreach ($words as $w) {
 <div class="user-info">
   <p><?= esc($name) ?></p>
   <small><?= esc($role) ?></small>
-</div> 
+</div>
 
 </div>
 
