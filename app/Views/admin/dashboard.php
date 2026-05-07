@@ -3,12 +3,13 @@
 
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-    /* GLOBAL */
     html,
     body {
         overflow-x: hidden !important;
+        background: #eef2f7;
     }
 
     * {
@@ -19,12 +20,15 @@
         display: none !important;
     }
 
-    /* CARDS */
+    .container-fluid {
+        padding-bottom: 10px !important;
+    }
+
     .stat-card {
-        border-radius: 14px;
-        padding: 20px;
+        border-radius: 16px;
+        padding: 22px;
         color: #fff;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
     .bg-total {
@@ -43,30 +47,33 @@
         background: linear-gradient(135deg, #ef4444, #dc2626);
     }
 
-    /* FILTER */
     .filter-card {
         background: #fff;
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        padding: 15px;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
 
-    /* TABLE */
     .table-card {
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        background: #fff;
     }
 
     .table-header {
-        background: #f8fafc;
-        border-bottom: 1px solid #e5e7eb;
+        background: #fff;
+        border-bottom: 1px solid #edf2f7;
+        padding: 16px 18px;
+        font-weight: 600;
     }
 
     .custom-table thead th {
         background: #4a7bdc;
-        color: #ffffff;
-        font-weight: 600;
+        color: #fff;
         font-size: 13px;
+        font-weight: 600;
+        border: none;
     }
 
     .custom-table tbody tr:hover {
@@ -82,7 +89,7 @@
     }
 
     .status-badge {
-        padding: 4px 10px;
+        padding: 5px 12px;
         border-radius: 20px;
         font-size: 12px;
     }
@@ -102,7 +109,19 @@
         color: #dc2626;
     }
 
-    /* CALENDAR */
+    .chart-card canvas {
+        max-height: 320px !important;
+    }
+
+    .activity-scroll {
+        max-height: 420px;
+        overflow-y: auto;
+    }
+
+    .equal-card {
+        height: 100%;
+    }
+
     .fc {
         background: #fff;
         border-radius: 16px;
@@ -131,6 +150,7 @@
         border-radius: 10px !important;
         padding: 6px;
         font-size: 12px;
+        cursor: pointer;
     }
 
     .event-approved {
@@ -147,6 +167,14 @@
         background: #ef4444 !important;
         color: #fff;
     }
+
+    @media(max-width:768px) {
+
+        .activity-scroll {
+            max-height: unset;
+        }
+
+    }
 </style>
 
 <div class="container-fluid">
@@ -154,11 +182,11 @@
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <h3 class="mb-0 fw-bold">
+        <h3 class="fw-bold mb-0">
             Welcome, <?= esc(session()->get('admin_name')) ?>
         </h3>
 
-        <button class="btn btn-primary py-2 px-3"
+        <button class="btn btn-primary px-4 py-2"
             data-bs-toggle="modal"
             data-bs-target="#calendarModal">
             View Calendar
@@ -166,7 +194,7 @@
 
     </div>
 
-    <!-- CARDS -->
+    <!-- TOP CARDS -->
     <div class="row g-3 mb-3">
 
         <div class="col-md-3">
@@ -199,6 +227,143 @@
 
     </div>
 
+    <!-- CHARTS -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-8">
+
+            <div class="card border-0 table-card chart-card equal-card">
+
+                <div class="card-header table-header">
+                    Monthly Appointments
+                </div>
+
+                <div class="card-body">
+                    <canvas id="barChart"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card border-0 table-card chart-card equal-card">
+
+                <div class="card-header table-header">
+                    Status Analytics
+                </div>
+
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <canvas id="pieChart"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- STAFF + ACTIVITY -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-8">
+
+            <div class="card border-0 table-card equal-card">
+
+                <div class="card-header table-header">
+                    Staff Performance
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table custom-table mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>Total</th>
+                                <th>Approved</th>
+                                <th>Rejected</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <?php foreach($staffAnalytics as $s): ?>
+
+                            <tr>
+
+                                <td><?= $s->emp_code ?></td>
+
+                                <td><?= $s->total ?></td>
+
+                                <td>
+                                    <span class="badge bg-success">
+                                        <?= $s->approved ?>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-danger">
+                                        <?= $s->rejected ?>
+                                    </span>
+                                </td>
+
+                            </tr>
+
+                            <?php endforeach; ?>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card border-0 table-card equal-card">
+
+                <div class="card-header table-header">
+                    Recent Activity
+                </div>
+
+                <div class="card-body activity-scroll">
+
+                    <?php foreach($activities as $a): ?>
+
+                    <div class="border-bottom pb-2 mb-2">
+
+                        <div class="fw-bold">
+                            <?= esc($a->name) ?>
+                        </div>
+
+                        <small>
+                            <?= esc($a->status) ?> Appointment
+                        </small>
+
+                        <br>
+
+                        <small class="text-muted">
+                            <?= date('d M Y h:i A', strtotime($a->appointment_datetime)) ?>
+                        </small>
+
+                    </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
     <!-- FILTER -->
     <div class="filter-card mb-3">
 
@@ -225,7 +390,8 @@
                         Apply
                     </button>
 
-                    <a href="<?= base_url('admin/dashboard') ?>" class="btn btn-secondary px-4">
+                    <a href="<?= base_url('admin/dashboard') ?>"
+                        class="btn btn-secondary px-4">
                         Reset
                     </a>
 
@@ -238,10 +404,10 @@
     </div>
 
     <!-- TABLE -->
-    <div class="card table-card border-0">
+    <div class="card border-0 table-card">
 
         <div class="card-header table-header">
-            <b>All Appointments</b>
+            All Appointments
         </div>
 
         <div class="table-responsive">
@@ -264,53 +430,53 @@
 
                     <?php foreach ($appointments as $row): ?>
 
-                        <tr>
+                    <tr>
 
-                            <td>
-                                <a href="<?= base_url('appointment/view/' . $row->id) ?>">
-                                    <?= esc($row->visitor_id) ?>
-                                </a>
-                            </td>
+                        <td>
+                            <a href="<?= base_url('appointment/view/' . $row->id) ?>">
+                                <?= esc($row->visitor_id) ?>
+                            </a>
+                        </td>
 
-                            <td><?= esc($row->name) ?></td>
+                        <td><?= esc($row->name) ?></td>
 
-                            <td><?= esc($row->mobile) ?></td>
+                        <td><?= esc($row->mobile) ?></td>
 
-                            <td>
-                                <span class="date-pill">
-                                    <?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?>
-                                </span>
-                            </td>
+                        <td>
+                            <span class="date-pill">
+                                <?= date('d M Y h:i A', strtotime($row->appointment_datetime)) ?>
+                            </span>
+                        </td>
 
-                            <td><?= esc($row->purpose) ?></td>
+                        <td><?= esc($row->purpose) ?></td>
 
-                            <td>
-                                <span class="status-badge <?= strtolower($row->status) ?>">
-                                    <?= $row->status ?>
-                                </span>
-                            </td>
+                        <td>
+                            <span class="status-badge <?= strtolower($row->status) ?>">
+                                <?= $row->status ?>
+                            </span>
+                        </td>
 
-                            <td>
+                        <td>
 
-                                <?php if ($row->status == 'Pending'): ?>
+                            <?php if ($row->status == 'Pending'): ?>
 
-                                    <a href="<?= base_url('admin/appointment/approve/' . $row->id) ?>"
-                                        class="btn btn-success btn-sm">
-                                        Approve
-                                    </a>
+                            <a href="<?= base_url('admin/appointment/approve/' . $row->id) ?>"
+                                class="btn btn-success btn-sm">
+                                Approve
+                            </a>
 
-                                    <a href="<?= base_url('admin/appointment/reject/' . $row->id) ?>"
-                                        class="btn btn-danger btn-sm">
-                                        Reject
-                                    </a>
+                            <a href="<?= base_url('admin/appointment/reject/' . $row->id) ?>"
+                                class="btn btn-danger btn-sm">
+                                Reject
+                            </a>
 
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
+                            <?php else: ?>
+                            -
+                            <?php endif; ?>
 
-                            </td>
+                        </td>
 
-                        </tr>
+                    </tr>
 
                     <?php endforeach; ?>
 
@@ -326,6 +492,7 @@
 
 <!-- CALENDAR -->
 <div class="modal fade" id="calendarModal">
+
     <div class="modal-dialog modal-xl modal-dialog-centered">
 
         <div class="modal-content p-3">
@@ -342,6 +509,66 @@
         </div>
 
     </div>
+
+</div>
+
+<!-- EVENT DETAIL MODAL -->
+<div class="modal fade" id="eventModal">
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content p-4"
+            style="border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,0.2);">
+
+            <div class="d-flex justify-content-between mb-2">
+
+                <h5 class="fw-bold">
+                    Appointment Detail
+                </h5>
+
+                <button class="btn-close"
+                    data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div style="background:#f8fafc;padding:12px;border-radius:10px;">
+
+                <p><b>Visitor:</b> <span id="e_name"></span></p>
+
+                <p><b>Visitor ID:</b> <span id="e_id"></span></p>
+
+                <p><b>Date:</b> <span id="e_date"></span></p>
+
+                <p><b>Purpose:</b> <span id="e_purpose"></span></p>
+
+                <p><b>Contact:</b> <span id="e_mobile"></span></p>
+
+                <p><b>Status:</b> <span id="e_status"></span></p>
+
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+
+                <a id="viewBtn"
+                    class="btn btn-primary w-100"
+                    target="_blank">
+                    View
+                </a>
+
+                <a id="approveBtn"
+                    class="btn btn-success w-100">
+                    Approve
+                </a>
+
+                <a id="rejectBtn"
+                    class="btn btn-danger w-100">
+                    Reject
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 </div>
 
 <?= $this->endSection() ?>
@@ -352,62 +579,177 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-    // DATE FILTER
-    flatpickr("#singleDate", {
-        dateFormat: "Y-m-d",
-        defaultDate: "today",
-        onChange: function(selectedDates, dateStr) {
-            fromDate.value = dateStr;
-            toDate.value = dateStr;
-        }
-    });
 
-    let calendar;
+flatpickr("#singleDate", {
 
-    document.addEventListener('DOMContentLoaded', function() {
+    dateFormat: "Y-m-d",
 
-        calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+    onChange: function(selectedDates, dateStr) {
 
-            initialView: 'timeGridWeek',
+        fromDate.value = dateStr;
+        toDate.value = dateStr;
+    }
+});
 
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'timeGridDay,timeGridWeek,dayGridMonth'
-            },
+let calendar;
 
-            height: 650,
-            nowIndicator: true,
-            allDaySlot: false,
-            slotMinTime: "09:00:00",
-            slotMaxTime: "20:00:00",
+document.addEventListener('DOMContentLoaded', function() {
 
-            events: <?= $calendarEvents ?? '[]' ?>,
+    calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
 
-            eventDidMount: function(info) {
+        initialView: 'timeGridWeek',
 
-                let s = info.event.extendedProps.status;
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'timeGridDay,timeGridWeek,dayGridMonth'
+        },
 
-                if (s == 'Approved')
-                    info.el.classList.add('event-approved');
+        height: 650,
 
-                if (s == 'Pending')
-                    info.el.classList.add('event-pending');
+        nowIndicator: true,
 
-                if (s == 'Rejected')
-                    info.el.classList.add('event-rejected');
+        allDaySlot: false,
+
+        slotMinTime: "09:00:00",
+
+        slotMaxTime: "20:00:00",
+
+        events: <?= $calendarEvents ?? '[]' ?>,
+
+        // CLICK EVENT
+        eventClick: function(info) {
+
+            let e = info.event.extendedProps;
+
+            document.getElementById('e_name').innerText =
+                info.event.title;
+
+            document.getElementById('e_id').innerText =
+                e.visitor_id ?? '-';
+
+            document.getElementById('e_date').innerText =
+                info.event.start.toLocaleString();
+
+            document.getElementById('e_purpose').innerText =
+                e.purpose ?? '-';
+
+            document.getElementById('e_mobile').innerText =
+                e.mobile ?? '-';
+
+            document.getElementById('e_status').innerText =
+                e.status ?? '-';
+
+            // IMPORTANT FIX
+            let appointmentId = info.event.id;
+
+            // VIEW
+            document.getElementById('viewBtn').href =
+                "<?= base_url('appointment/view/') ?>" + appointmentId;
+
+            // APPROVE
+            document.getElementById('approveBtn').href =
+                "<?= base_url('admin/appointment/approve/') ?>" + appointmentId;
+
+            // REJECT
+            document.getElementById('rejectBtn').href =
+                "<?= base_url('admin/appointment/reject/') ?>" + appointmentId;
+
+            // STATUS CHECK
+            if (e.status !== 'Pending') {
+
+                document.getElementById('approveBtn')
+                    .style.display = 'none';
+
+                document.getElementById('rejectBtn')
+                    .style.display = 'none';
+
+            } else {
+
+                document.getElementById('approveBtn')
+                    .style.display = 'block';
+
+                document.getElementById('rejectBtn')
+                    .style.display = 'block';
             }
 
-        });
+            // SHOW MODAL
+            new bootstrap.Modal(
+                document.getElementById('eventModal')
+            ).show();
+        },
+
+        // EVENT COLORS
+        eventDidMount: function(info) {
+
+            let s = info.event.extendedProps.status;
+
+            if (s == 'Approved')
+                info.el.classList.add('event-approved');
+
+            if (s == 'Pending')
+                info.el.classList.add('event-pending');
+
+            if (s == 'Rejected')
+                info.el.classList.add('event-rejected');
+        }
 
     });
 
-    document.addEventListener('shown.bs.modal', function(e) {
+    calendar.render();
 
-        if (e.target.id === 'calendarModal')
-            calendar.render();
+});
 
-    });
+document.addEventListener('shown.bs.modal', function(e) {
+
+    if (e.target.id === 'calendarModal')
+        calendar.updateSize();
+
+});
+
+// BAR CHART
+new Chart(document.getElementById('barChart'), {
+
+    type: 'bar',
+
+    data: {
+
+        labels: <?= $chartLabels ?>,
+
+        datasets: [{
+            label: 'Appointments',
+            data: <?= $chartValues ?>,
+            borderWidth: 1,
+            borderRadius: 8
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// PIE CHART
+new Chart(document.getElementById('pieChart'), {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: ['Approved', 'Pending', 'Rejected'],
+
+        datasets: [{
+            data: <?= $pieData ?>
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
 </script>
 
 <?= $this->endSection(); ?>
