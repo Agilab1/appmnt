@@ -308,7 +308,7 @@
             </div>
 
             <div class="d-flex gap-2 mt-3">
-                <a id="editBtn" class="btn btn-primary w-100">Edit</a>
+                <a id="editBtn" class="btn btn-primary w-100">View</a>
                 <a id="approveBtn" class="btn btn-success w-100">Approve</a>
                 <a id="rejectBtn" class="btn btn-danger w-100">Reject</a>
             </div>
@@ -367,10 +367,11 @@
                 if (s == 'Rejected') info.el.classList.add('event-rejected');
             },
 
-            /* 🔥 FINAL POPUP */
+            /*  FINAL POPUP */
             eventClick: function(info) {
 
                 let e = info.event.extendedProps;
+                
 
                 e_name.innerText = info.event.title;
                 e_id.innerText = e.visitor_id;
@@ -378,9 +379,24 @@
                 e_purpose.innerText = e.purpose;
                 e_mobile.innerText = e.mobile;
 
-                editBtn.href = "<?= base_url('appointment/view/') ?>" + e.id;
-                approveBtn.href = "<?= base_url('staff/appointment/approve/') ?>" + e.id;
-                rejectBtn.href = "<?= base_url('staff/appointment/reject/') ?>" + e.id;
+                // editBtn.href = "<?= base_url('appointment/view/') ?>" + e.id;
+                editBtn.href ="<?= base_url('appointment/view/') ?>" +info.event.id;
+                // approveBtn.href = "<?= base_url('staff/appointment/approve/') ?>" + e.id;
+                approveBtn.href = "<?= base_url('staff/appointment/approve/') ?>" + info.event.id;
+                // rejectBtn.href = "<?= base_url('staff/appointment/reject/') ?>" + e.id;
+                rejectBtn.href = "<?= base_url('staff/appointment/reject/') ?>" + info.event.id;
+
+                 //  STATUS LOGIC
+                    if (e.status == 'Pending') {
+
+                        approveBtn.style.display = 'block';
+                        rejectBtn.style.display = 'block';
+
+                    } else {
+
+                        approveBtn.style.display = 'none';
+                        rejectBtn.style.display = 'none';
+                    }
 
                 new bootstrap.Modal(document.getElementById('eventModal')).show();
             }
