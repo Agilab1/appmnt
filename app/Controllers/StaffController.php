@@ -191,7 +191,7 @@ class StaffController extends BaseController
                     : ($row->status == 'Pending' ? '#ffc107' : '#dc3545')
             ];
         }
-        
+
 
         $data['total']          = $total;
         $data['pending']        = $pending;
@@ -473,7 +473,7 @@ class StaffController extends BaseController
 
     public function update($id)
     {
-        if (session()->get('role') !== 'admin') {
+        if (!session()->get('isLoggedIn')) {
             return redirect()->to('/login');
         }
 
@@ -529,7 +529,53 @@ class StaffController extends BaseController
             ]);
         }
 
-        return redirect()->to('/users')->with('success', 'User updated');
+        if (session()->get('role') == 'admin') {
+            return redirect()->to('/users')->with('success', 'User updated');
+        }
+        return redirect()->back()->with('success', 'Profile updated successfully');
+    }
+    public function profile()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/login');
+        }
+
+        $role = session()->get('role');
+
+        // STAFF
+        if ($role == 'staff') {
+
+            return redirect()->to(
+                base_url(
+                    'staff/edit/' .
+                        session()->get('emp_code')
+                )
+            );
+        }
+
+        // ADMIN
+        elseif ($role == 'admin') {
+
+            return redirect()->to(
+                base_url(
+                    'staff/edit/ADMIN-' .
+                        session()->get('admin_id')
+                )
+            );
+        }
+
+        // SECURITY
+        elseif ($role == 'security') {
+
+            return redirect()->to(
+                base_url(
+                    'staff/edit/SEC-' .
+                        session()->get('security_id')
+                )
+            );
+        }
+
+        return redirect()->back();
     }
 
     public function delete($id)
@@ -572,7 +618,7 @@ class StaffController extends BaseController
 
     public function edit($id)
     {
-        if (session()->get('role') !== 'admin') {
+        if (!session()->get('isLoggedIn')) {
             return redirect()->to('/login');
         }
 

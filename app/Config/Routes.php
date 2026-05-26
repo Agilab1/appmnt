@@ -122,8 +122,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('dashboard', 'StaffController::dashboard');
         $routes->get('create', 'StaffController::create', ['filter' => 'admin']);
         $routes->post('save', 'StaffController::save', ['filter' => 'admin']);
-        $routes->get('edit/(:any)', 'StaffController::edit/$1', ['filter' => 'admin']);
-        $routes->post('update/(:any)', 'StaffController::update/$1', ['filter' => 'admin']);
+        $routes->get('edit/(:any)', 'StaffController::edit/$1');
+        $routes->post('update/(:any)', 'StaffController::update/$1');
+        $routes->get('profile', 'StaffController::profile');
         $routes->get('delete/(:any)', 'StaffController::delete/$1', ['filter' => 'admin']);
         // // $routes->get('appointment/approve/(:num)', 'StaffController::approve/$1');
         // $routes->post('appointment/approve/(:num)', 'StaffController::approve/$1');

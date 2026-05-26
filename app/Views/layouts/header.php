@@ -225,7 +225,7 @@ if (!empty($name)) {
                         <hr>
                     </li>
                     <li class="d-flex justify-content-between px-3 pb-2">
-                        <a href="#" class="btn btn-sm btn-outline-primary">Profile</a>
+                        <a href="<?= base_url('staff/profile') ?>" class="btn btn-sm btn-outline-primary">Profile</a>
                         <a href="<?= base_url('logout') ?>" class="btn btn-sm btn-danger">Logout</a>
                     </li>
                 </ul>

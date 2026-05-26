@@ -21,7 +21,7 @@
    <form method="post"
       id="form"
       action="<?= ($mode == 'edit')
-          ? site_url('staff/update/'.$staff->emp_code)
+          ? site_url('staff/update/'. $staff->emp_code)
           : site_url('staff/save') ?>">
 
 
@@ -58,11 +58,9 @@
                         <i class="fa fa-save"></i>
                     </button>
 
-                    <a href="<?= site_url('staff/delete/'.$staff->emp_code) ?>"
-                       class="btn btn-danger float-end me-3"
-                       onclick="return confirm('Delete this user?');">
-                        <i class="fa fa-trash"></i>
-                    </a>
+                     <?php if (session()->get('role') == 'admin'): ?>
+                        <a href="<?= site_url('staff/delete/' . $staff->emp_code) ?>" class="btn btn-danger float-end me-3"  onclick="return confirm('Delete this user?');"> <i class="fa fa-trash"></i> </a>
+                    <?php endif; ?>
 
                 <?php endif; ?>
             </div>
@@ -123,7 +121,7 @@
             <label>Role</label>
             <select name="role"
                     class="form-control"
-                    <?= ($mode == 'edit') ? 'disabled' : '' ?>>
+                    <?= ($mode == 'edit') ? 'readonly' : '' ?>>
                 <?php foreach ($types as $param => $value): ?>
                     <option value="<?= $param ?>"
                         <?= (isset($staff->role) && $staff->role == $param) ? 'selected' : '' ?>>
