@@ -327,11 +327,21 @@
 <script>
     // DATE FILTER
     flatpickr("#singleDate", {
+
         dateFormat: "Y-m-d",
-        defaultDate: "today",
+
+        defaultDate: "<?= $_GET['from'] ?? date('Y-m-d') ?>",
+
+        onReady: function(selectedDates, dateStr) {
+
+            document.getElementById('fromDate').value = dateStr;
+            document.getElementById('toDate').value = dateStr;
+        },
+
         onChange: function(selectedDates, dateStr) {
-            fromDate.value = dateStr;
-            toDate.value = dateStr;
+
+            document.getElementById('fromDate').value = dateStr;
+            document.getElementById('toDate').value = dateStr;
         }
     });
 
@@ -371,7 +381,7 @@
             eventClick: function(info) {
 
                 let e = info.event.extendedProps;
-                
+
 
                 e_name.innerText = info.event.title;
                 e_id.innerText = e.visitor_id;
@@ -380,23 +390,23 @@
                 e_mobile.innerText = e.mobile;
 
                 // editBtn.href = "<?= base_url('appointment/view/') ?>" + e.id;
-                editBtn.href ="<?= base_url('appointment/view/') ?>" +info.event.id;
+                editBtn.href = "<?= base_url('appointment/view/') ?>" + info.event.id;
                 // approveBtn.href = "<?= base_url('staff/appointment/approve/') ?>" + e.id;
                 approveBtn.href = "<?= base_url('staff/appointment/approve/') ?>" + info.event.id;
                 // rejectBtn.href = "<?= base_url('staff/appointment/reject/') ?>" + e.id;
                 rejectBtn.href = "<?= base_url('staff/appointment/reject/') ?>" + info.event.id;
 
-                 //  STATUS LOGIC
-                    if (e.status == 'Pending') {
+                //  STATUS LOGIC
+                if (e.status == 'Pending') {
 
-                        approveBtn.style.display = 'block';
-                        rejectBtn.style.display = 'block';
+                    approveBtn.style.display = 'block';
+                    rejectBtn.style.display = 'block';
 
-                    } else {
+                } else {
 
-                        approveBtn.style.display = 'none';
-                        rejectBtn.style.display = 'none';
-                    }
+                    approveBtn.style.display = 'none';
+                    rejectBtn.style.display = 'none';
+                }
 
                 new bootstrap.Modal(document.getElementById('eventModal')).show();
             }

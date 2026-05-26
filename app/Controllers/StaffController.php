@@ -99,22 +99,30 @@ class StaffController extends BaseController
         $appointmentModel = new AppointmentModel();
 
         // COUNT CARDS (UNCHANGED)
-        $total = $appointmentModel->where('emp_code', $empCode)->countAllResults();
+        $filterDate = $this->request->getGet('from') ?: date('Y-m-d');
 
-        $pending = $appointmentModel->where([
-            'emp_code' => $empCode,
-            'status'   => 'Pending'
-        ])->countAllResults();
+        $total = $appointmentModel
+            ->where('emp_code', $empCode)
+            ->where('DATE(appointment_datetime)', $filterDate)
+            ->countAllResults();
 
-        $approved = $appointmentModel->where([
-            'emp_code' => $empCode,
-            'status'   => 'Approved'
-        ])->countAllResults();
+        $pending = $appointmentModel
+            ->where('emp_code', $empCode)
+            ->where('status', 'Pending')
+            ->where('DATE(appointment_datetime)', $filterDate)
+            ->countAllResults();
 
-        $rejected = $appointmentModel->where([
-            'emp_code' => $empCode,
-            'status'   => 'Rejected'
-        ])->countAllResults();
+        $approved = $appointmentModel
+            ->where('emp_code', $empCode)
+            ->where('status', 'Approved')
+            ->where('DATE(appointment_datetime)', $filterDate)
+            ->countAllResults();
+
+        $rejected = $appointmentModel
+            ->where('emp_code', $empCode)
+            ->where('status', 'Rejected')
+            ->where('DATE(appointment_datetime)', $filterDate)
+            ->countAllResults();
 
         /*
     ==================================================
@@ -151,9 +159,10 @@ class StaffController extends BaseController
             $data['f_approved'] = $f_approved;
             $data['f_rejected'] = $f_rejected;
         } else {
-            // DEFAULT LIST (UNCHANGED)
+            $today = date('Y-m-d');
             $appointments = $appointmentModel
                 ->where('emp_code', $empCode)
+                ->where('DATE(appointment_datetime)', $today)
                 ->orderBy('appointment_datetime', 'DESC')
                 ->findAll();
         }
@@ -199,7 +208,7 @@ class StaffController extends BaseController
         return redirect()->to('/login');
     }
 
-    
+
     public function approve($id)
     {
         //  LOGIN + ROLE CHECK
@@ -264,7 +273,7 @@ class StaffController extends BaseController
             ->with('success', 'Appointment approved and email sent successfully');
     }
 
-    
+
     public function reject($id)
     {
         // 🔒 LOGIN + ROLE CHECK
@@ -694,5 +703,4 @@ class StaffController extends BaseController
 
         return view('staff/staffList', $data);
     }
-    
 }
