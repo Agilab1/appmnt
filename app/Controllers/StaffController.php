@@ -191,6 +191,7 @@ class StaffController extends BaseController
                     : ($row->status == 'Pending' ? '#ffc107' : '#dc3545')
             ];
         }
+        
 
         $data['total']          = $total;
         $data['pending']        = $pending;
