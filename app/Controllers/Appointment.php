@@ -8,16 +8,35 @@ use App\Models\StaffModel;
 
 class Appointment extends BaseController
 {
-    public function form($admin_id)
+    public function form($admin_id  = null)
     {
+        //ADD FOR STAFF AUTO SELECT APPOINTMENT
+        $loggedEmpCode = session()->get('emp_code');
+        $data['loggedEmpCode'] = $loggedEmpCode;
         $staffModel       = new \App\Models\StaffModel();
         $appointmentModel = new \App\Models\AppointmentModel();
         $data['admin_id'] = $admin_id;
-        //  Staff List (Same as before)
-        $data['staffs'] = $staffModel
-            ->where('status', 1)
-            ->findAll();
-        // | Auto Visitor ID Logic (UNCHANGED)
+        // //  Staff List (Same as before)
+        // $data['staffs'] = $staffModel
+        //     ->where('status', 1)
+        //     ->findAll();
+        // // | Auto Visitor ID Logic (UNCHANGED)
+
+        if (session()->get('role') === 'staff') {
+
+            // Only logged-in staff
+            $data['staffs'] = $staffModel
+                ->where('emp_code', session()->get('emp_code'))
+                ->where('status', 1)
+                ->findAll();
+
+        } else {
+
+            // Admin can see all staff
+            $data['staffs'] = $staffModel
+                ->where('status', 1)
+                ->findAll();
+        }
 
         $today = date('Ymd');
         $count = $appointmentModel

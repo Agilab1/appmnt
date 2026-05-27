@@ -3,6 +3,10 @@
 
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
 
 <style>
     /* GLOBAL */
@@ -157,13 +161,25 @@
         <h3 class="mb-0 fw-bold">
             Welcome, <?= esc(session()->get('staff_name')) ?>
         </h3>
+        <div class="d-flex gap-2">
+
+        <!-- CREATE APPOINTMENT -->
+        <a href="<?= base_url('appointment/form/' . session()->get('admin_id')) ?>"
+            class="btn btn-success py-2 px-3">
+
+            <i class="fas fa-plus-circle"></i> Create Appointment
+
+        </a>
+
+        <!-- VIEW CALENDAR -->
 
         <button class="btn btn-primary py-2 px-3"
             data-bs-toggle="modal"
             data-bs-target="#calendarModal">
-            View Calendar
+            <i class="fas fa-calendar-alt"></i> View Calendar
         </button>
 
+    </div>
     </div>
 
     <!-- CARDS -->

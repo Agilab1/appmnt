@@ -90,6 +90,7 @@ $routes->get('admin/logout', 'StaffController::logout');
 // | PUBLIC APPOINTMENT
 
 $routes->get('appointment/form/(:num)', 'Appointment::form/$1');
+$routes->get('appointment/form', 'Appointment::form');
 $routes->post('appointment/submit', 'Appointment::submit');
 $routes->get('appointment/success', 'Appointment::success');
 $routes->get('appointment/booked-dates', 'Appointment::bookedDates');

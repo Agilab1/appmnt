@@ -151,7 +151,7 @@ textarea {
                         <form method="post"
                             action="<?= $isEdit ? base_url('appointment/update/' . $appointment->id) : base_url('appointment/submit') ?>">
 
-                            <input type="hidden" name="admin_id" value="<?= $admin_id ?>">
+                            <input type="hidden" name="admin_id" value="<?= $admin_id ?? 1  ?>">
 
                             <!-- Name -->
                             <div class="mb-3">
@@ -209,7 +209,7 @@ textarea {
                                 <select name="emp_code"
                                     id="staffSelect"
                                     class="form-control form-control-lg"
-                                    <?= $isView ? 'disabled' : '' ?>
+                                    <?= ($isView || session()->get('role') === 'staff') ? 'disabled' : '' ?>
                                     required>
 
                                     <option value="">Choose Staff</option>
@@ -217,7 +217,11 @@ textarea {
                                     <?php foreach ($staffs as $staff): ?>
 
                                         <option value="<?= esc($staff->emp_code) ?>"
-                                            <?= (isset($appointment->emp_code) && $appointment->emp_code == $staff->emp_code) ? 'selected' : '' ?>>
+                                            <?= (
+                                                (isset($appointment->emp_code) && $appointment->emp_code == $staff->emp_code)  ||
+                                                    (session()->get('role') === 'staff'
+                                                    && session()->get('emp_code') == $staff->emp_code)
+                                                )  ? 'selected' : '' ?>>
 
                                             <?= esc($staff->first_nm . ' ' . $staff->last_nm) ?>
 
@@ -226,6 +230,12 @@ textarea {
                                     <?php endforeach; ?>
 
                                 </select>
+                                <?php if (session()->get('role') === 'staff'): ?>
+                                <input type="hidden"
+                                    name="emp_code"
+                                    value="<?= session()->get('emp_code') ?>">
+
+                            <?php endif; ?>
 
                             </div>
 
@@ -241,6 +251,7 @@ textarea {
                                 </div>
 
                             </div>
+
 
                             <!-- Selected Time -->
                             <div class="mb-3">
@@ -410,6 +421,9 @@ textarea {
             });
 
             document.getElementById("staffSelect").addEventListener("change", loadSlots);
+            window.onload = function () {
+                loadSlots();
+            };
 
             function loadSlots() {
 
